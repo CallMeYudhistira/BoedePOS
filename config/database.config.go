@@ -4,20 +4,19 @@ import (
 	"database/sql"
 	"os"
 
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	_ "github.com/lib/pq"
 )
 
-func Connect() (*sql.DB, error) {
+func ConnectSQL() (*sql.DB, error) {
 	dsn := os.Getenv("DATABASE_DSN")
+	return sql.Open("postgres", dsn)
+}
 
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return db, nil
+func ConnectGorm(sqlDB *sql.DB) (*gorm.DB, error) {
+	return gorm.Open(postgres.New(postgres.Config{
+		Conn: sqlDB,
+	}), &gorm.Config{})
 }

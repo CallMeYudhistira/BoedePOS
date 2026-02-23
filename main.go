@@ -10,32 +10,35 @@ import (
 )
 
 func main() {
-	// 1️⃣ Load environment
+
+	// 1️⃣ Load env
 	if err := config.LoadEnvironment(); err != nil {
 		log.Fatal(err)
 	}
 
-	// 2️⃣ Connect DB
-	db, err := config.Connect()
+	// 2️⃣ Connect SQL (for migration)
+	sqlDB, err := config.ConnectSQL()
 	if err != nil {
-		log.Fatal("DB connection failed:", err)
+		log.Fatal("SQL connection failed:", err)
 	}
-	defer db.Close()
+	defer sqlDB.Close()
 
-	log.Println("Database connected ✅")
-
-	// 3️⃣ Run Migration
-	migrator := database.NewMigrator(db)
-
+	// 3️⃣ Run migration
+	migrator := database.NewMigrator(sqlDB)
 	if err := migrator.Up(); err != nil {
 		log.Fatal("Migration failed:", err)
 	}
-
 	log.Println("Migration complete ✅")
 
-	// 4️⃣ Start Server
-	PORT := os.Getenv("APP_PORT")
+	// 4️⃣ Connect GORM
+	gormDB, err := config.ConnectGorm(sqlDB)
+	if err != nil {
+		log.Fatal("GORM connection failed:", err)
+	}
 
+	// 5️⃣ Start server
+	PORT := os.Getenv("APP_PORT")
 	log.Println("Running at", PORT)
-	router.StartServer(db).Run(PORT)
+
+	router.StartServer(gormDB).Run(PORT)
 }

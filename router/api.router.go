@@ -2,13 +2,13 @@ package router
 
 import (
 	"github.com/CallMeYudhistira/BoedePOS/config"
-	"database/sql"
+	"gorm.io/gorm"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-func StartServer(db *sql.DB) *gin.Engine {
+func StartServer(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
 	// =====================

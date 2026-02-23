@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -10,9 +9,10 @@ import (
 	"github.com/CallMeYudhistira/BoedePOS/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 )
 
-func GetAll(db *sql.DB) gin.HandlerFunc {
+func GetAll(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		products, err := repository.GetAllProduct(db)
 		if err != nil {
@@ -34,7 +34,7 @@ func GetAll(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
-func Store(db *sql.DB) gin.HandlerFunc {
+func Store(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var product model.Product
 
@@ -59,7 +59,7 @@ func Store(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		err, lastId := repository.CreateProduct(db, product)
+		err := repository.CreateProduct(db, &product)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
@@ -70,7 +70,7 @@ func Store(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		response, err := repository.GetProduct(db, *lastId)
+		response, err := repository.GetProduct(db, product.ID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
@@ -90,7 +90,7 @@ func Store(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
-func Find(db *sql.DB) gin.HandlerFunc {
+func Find(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -103,17 +103,8 @@ func Find(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		product, err := repository.GetProduct(db, id)
+		product, err := repository.GetProduct(db, uint(id))
 		if err != nil {
-			if err == sql.ErrNoRows {
-				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-					"success": false,
-					"message": "Product not found.",
-					"error":   nil,
-					"data":    nil,
-				})
-				return
-			}
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Internal server error.",
@@ -132,7 +123,7 @@ func Find(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
-func Update(db *sql.DB) gin.HandlerFunc {
+func Update(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var product model.Product
 		id, err := strconv.Atoi(c.Param("id"))
@@ -158,8 +149,8 @@ func Update(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		product.ID = id
-		if err := repository.Updateproduct(db, product); err != nil {
+		product.ID = uint(id)
+		if err := repository.UpdateProduct(db, &product); err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Internal server error.",
@@ -169,7 +160,7 @@ func Update(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		response, err := repository.GetProduct(db, id)
+		response, err := repository.GetProduct(db, product.ID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
@@ -189,7 +180,7 @@ func Update(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
-func Destroy(db *sql.DB) gin.HandlerFunc {
+func Destroy(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -202,7 +193,7 @@ func Destroy(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		err = repository.Deleteproduct(db, id)
+		err = repository.DeleteProduct(db, uint(id))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,

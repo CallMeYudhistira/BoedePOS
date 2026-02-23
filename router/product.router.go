@@ -1,13 +1,12 @@
 package router
 
 import (
-	"database/sql"
-
 	"github.com/CallMeYudhistira/BoedePOS/handler"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func AddProductRouter(db *sql.DB, rg *gin.RouterGroup) {
+func AddProductRouter(db *gorm.DB, rg *gin.RouterGroup) {
 	product := rg.Group("/products")
 
 	product.GET("/", handler.GetAll(db))
