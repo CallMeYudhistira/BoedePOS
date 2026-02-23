@@ -25,5 +25,7 @@ func StartServer(db *sql.DB) *gin.Engine {
 		c.JSON(200, gin.H{"message": "BoedePOS running 🚀"})
 	})
 
+	AddProductRouter(db, api)
+
 	return r
 }
