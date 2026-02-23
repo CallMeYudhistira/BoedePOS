@@ -9,9 +9,9 @@ import (
 func AddProductRouter(db *gorm.DB, rg *gin.RouterGroup) {
 	product := rg.Group("/products")
 
-	product.GET("/", handler.GetAll(db))
-	product.POST("/", handler.Store(db))
-	product.GET("/:id", handler.Find(db))
-	product.PUT("/:id", handler.Update(db))
-	product.DELETE("/:id", handler.Destroy(db))
+	product.GET("/", handler.GetAllProduct(db))
+	product.POST("/", handler.StoreProduct(db))
+	product.GET("/:id", handler.FindProduct(db))
+	product.PUT("/:id", handler.UpdateProduct(db))
+	product.DELETE("/:id", handler.DestroyProduct(db))
 }

@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetAll(db *gorm.DB) gin.HandlerFunc {
+func GetAllProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		products, err := repository.GetAllProduct(db)
 		if err != nil {
@@ -34,7 +34,7 @@ func GetAll(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func Store(db *gorm.DB) gin.HandlerFunc {
+func StoreProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var product model.Product
 
@@ -90,7 +90,7 @@ func Store(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func Find(db *gorm.DB) gin.HandlerFunc {
+func FindProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -123,7 +123,7 @@ func Find(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func Update(db *gorm.DB) gin.HandlerFunc {
+func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var product model.Product
 		id, err := strconv.Atoi(c.Param("id"))
@@ -180,7 +180,7 @@ func Update(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func Destroy(db *gorm.DB) gin.HandlerFunc {
+func DestroyProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {

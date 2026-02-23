@@ -26,6 +26,7 @@ func StartServer(db *gorm.DB) *gin.Engine {
 	})
 
 	AddProductRouter(db, api)
+	AddPriceLogRouter(db, api)
 
 	return r
 }

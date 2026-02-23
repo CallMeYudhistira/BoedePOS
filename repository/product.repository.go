@@ -11,13 +11,13 @@ func CreateProduct(db *gorm.DB, product *model.Product) error {
 
 func GetProduct(db *gorm.DB, id uint) (model.Product, error) {
 	var product model.Product
-	err := db.First(&product, id).Error
+	err := db.Preload("PriceLogs").First(&product, id).Error
 	return product, err
 }
 
 func GetAllProduct(db *gorm.DB) ([]model.Product, error) {
 	var products []model.Product
-	err := db.Find(&products).Error
+	err := db.Preload("PriceLogs").Find(&products).Error
 	return products, err
 }
 

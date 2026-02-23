@@ -24,25 +24,25 @@ func FormatValidationError(err error) map[string]string {
 
 		switch e.Tag() {
 		case "required":
-			errors[field] = fmt.Sprintf("%s field is required", field)
+			errors[field] = fmt.Sprintf("%s wajib diisi.", field)
 
 		case "min":
 			errors[field] = fmt.Sprintf(
-				"%s must be at least %s characters",
+				"%s setidaknya harus bernilai %s atau lebih.",
 				field,
 				e.Param(),
 			)
 
 		case "max":
 			errors[field] = fmt.Sprintf(
-				"%s must be at most %s characters",
+				"%s tidak boleh bernilai lebih dari %s.",
 				field,
 				e.Param(),
 			)
 
 		case "number":
 			errors[field] = fmt.Sprintf(
-				"%s must be number value",
+				"%s harus bernilai angka.",
 				field,
 			)
 
