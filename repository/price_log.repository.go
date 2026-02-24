@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"time"
-
+	"github.com/CallMeYudhistira/BoedePOS/helper"
 	"github.com/CallMeYudhistira/BoedePOS/model"
 	"gorm.io/gorm"
 )
@@ -14,25 +13,33 @@ func GetPriceLogs(db *gorm.DB, productID uint) ([]model.PriceLog, error) {
 }
 
 func StorePriceLog(db *gorm.DB, priceLog *model.PriceLog) error {
-	err := db.Table("products").Where("id = ?", priceLog.ProductID).Update("price", priceLog.NewPrice).Error
-	if err != nil {
-		return err
-	}
+	return db.Transaction(func(tx *gorm.DB) error {
+		priceLog.CreatedAt = helper.NowLocale()
 
-	err = db.Create(priceLog).Error
-	return err
+		if err := tx.Model(&model.Product{}).
+			Where("id = ?", priceLog.ProductID).
+			Update("price", priceLog.NewPrice).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(priceLog).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func CheckPriceLogToday(db *gorm.DB, productID uint) error {
 	var existing model.PriceLog
-	todayStart := time.Now().Truncate(24 * time.Hour)
-	tomorrow := todayStart.Add(24 * time.Hour)
+
+	now := helper.NowLocale()
+	today := now.Format("2006-01-02") // format YYYY-MM-DD
 
 	return db.Where(
-		"product_id = ? AND created_at >= ? AND created_at < ?",
+		"product_id = ? AND DATE(created_at) = ?",
 		productID,
-		todayStart,
-		tomorrow,
+		today,
 	).First(&existing).Error
 }
 

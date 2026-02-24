@@ -8,6 +8,11 @@ CREATE TABLE price_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE UNIQUE INDEX unique_price_update_per_day
+ON price_logs (product_id, DATE(created_at));
+
 -- +migrate Down
+
+DROP INDEX IF EXISTS unique_price_update_per_day;
 
 DROP TABLE IF EXISTS price_logs;

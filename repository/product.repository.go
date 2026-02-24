@@ -22,7 +22,11 @@ func GetAllProduct(db *gorm.DB) ([]model.Product, error) {
 }
 
 func UpdateProduct(db *gorm.DB, product *model.Product) error {
-	return db.Updates(product).Error
+	return db.Model(&model.Product{}).
+		Where("id = ?", product.ID).
+		Omit("price").
+		Select("name", "is_fraction").
+		Updates(product).Error
 }
 
 func DeleteProduct(db *gorm.DB, id uint) error {
