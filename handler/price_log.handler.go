@@ -16,6 +16,16 @@ func GetPriceLogs(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
+
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{
+					"success": false,
+					"message": "Product not found.",
+					"error":   err.Error(),
+				})
+				return
+			}
+
 			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid product ID", "error": err.Error()})
 			return
 		}
@@ -32,10 +42,16 @@ func GetPriceLogs(db *gorm.DB) gin.HandlerFunc {
 
 func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		var priceLog model.PriceLog
+
 		productID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid product ID", "error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid product ID",
+				"error":   err.Error(),
+			})
 			return
 		}
 
@@ -49,19 +65,64 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 				return
 			}
 
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid request body", "error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid request body",
+				"error":   err.Error(),
+			})
 			return
 		}
 
 		priceLog.ProductID = uint(productID)
 
-		if err := repository.StorePriceLog(db, &priceLog); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to store price log", "error": err.Error()})
+		err = repository.CheckPriceLogToday(db, priceLog.ProductID)
+		if err == nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Product already has price update today",
+				"error":   nil,
+			})
+			return
+		}
+		if err != gorm.ErrRecordNotFound {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "Database error",
+				"error":   err.Error(),
+			})
 			return
 		}
 
-		db.Preload("Product").First(&priceLog, priceLog.ID)
+		_, err = repository.GetProduct(db, priceLog.ProductID)
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{
+					"success": false,
+					"message": "Product not found.",
+					"error":   err.Error(),
+				})
+				return
+			}
 
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "Internal server error.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
+			return
+		}
+
+		if err := repository.StorePriceLog(db, &priceLog); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "Failed to store price log",
+				"error":   err.Error(),
+			})
+			return
+		}
+
+		err = repository.FindPriceLog(db, &priceLog)
 		c.JSON(http.StatusCreated, gin.H{
 			"success": true,
 			"message": "Price log created successfully",

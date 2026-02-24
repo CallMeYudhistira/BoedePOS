@@ -22,7 +22,7 @@ func GetAllProduct(db *gorm.DB) ([]model.Product, error) {
 }
 
 func UpdateProduct(db *gorm.DB, product *model.Product) error {
-	return db.Save(product).Error
+	return db.Updates(product).Error
 }
 
 func DeleteProduct(db *gorm.DB, id uint) error {

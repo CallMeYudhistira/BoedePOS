@@ -39,7 +39,6 @@ func StoreProduct(db *gorm.DB) gin.HandlerFunc {
 		var product model.Product
 
 		if err := c.ShouldBindJSON(&product); err != nil {
-
 			if ve, ok := err.(validator.ValidationErrors); ok {
 				c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
 					"success": false,
@@ -105,6 +104,15 @@ func FindProduct(db *gorm.DB) gin.HandlerFunc {
 
 		product, err := repository.GetProduct(db, uint(id))
 		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{
+					"success": false,
+					"message": "Product not found.",
+					"error":   err.Error(),
+				})
+				return
+			}
+
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Internal server error.",
@@ -162,6 +170,15 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 
 		response, err := repository.GetProduct(db, product.ID)
 		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{
+					"success": false,
+					"message": "Product not found.",
+					"error":   err.Error(),
+				})
+				return
+			}
+
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Internal server error.",
@@ -184,6 +201,26 @@ func DestroyProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "Internal server error.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
+			return
+		}
+
+		_, err = repository.GetProduct(db, uint(id))
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{
+					"success": false,
+					"message": "Product not found.",
+					"error":   err.Error(),
+				})
+				return
+			}
+
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Internal server error.",

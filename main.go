@@ -25,7 +25,7 @@ func main() {
 
 	// 3️⃣ Run migration
 	migrator := database.NewMigrator(sqlDB)
-	if err := migrator.Up(); err != nil {
+	if err := migrator.Down(); err != nil {
 		log.Fatal("Migration failed:", err)
 	}
 	log.Println("Migration complete ✅")
