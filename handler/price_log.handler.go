@@ -22,21 +22,22 @@ func GetPriceLogs(db *gorm.DB) gin.HandlerFunc {
 					"success": false,
 					"message": "Product not found.",
 					"error":   err.Error(),
+					"data":    nil,
 				})
 				return
 			}
 
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid product ID", "error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid product ID", "error": err.Error(), "data": nil})
 			return
 		}
 
 		priceLogs, err := repository.GetPriceLogs(db, uint(id))
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to get price logs", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to get price logs", "error": err.Error(), "data": nil})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"success": true, "message": nil, "data": priceLogs})
+		c.JSON(http.StatusOK, gin.H{"success": true, "message": nil, "error": nil, "data": priceLogs})
 	}
 }
 
@@ -51,6 +52,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 				"success": false,
 				"message": "Invalid product ID",
 				"error":   err.Error(),
+				"data":    nil,
 			})
 			return
 		}
@@ -61,6 +63,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 					"success": false,
 					"message": "Validation error",
 					"error":   helper.FormatValidationError(ve),
+					"data":    nil,
 				})
 				return
 			}
@@ -69,6 +72,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 				"success": false,
 				"message": "Invalid request body",
 				"error":   err.Error(),
+				"data":    nil,
 			})
 			return
 		}
@@ -81,6 +85,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 				"success": false,
 				"message": "Product already has price update today",
 				"error":   nil,
+				"data":    nil,
 			})
 			return
 		}
@@ -89,6 +94,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 				"success": false,
 				"message": "Database error",
 				"error":   err.Error(),
+				"data":    nil,
 			})
 			return
 		}
@@ -100,6 +106,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 					"success": false,
 					"message": "Product not found.",
 					"error":   err.Error(),
+					"data":    nil,
 				})
 				return
 			}
@@ -118,6 +125,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 				"success": false,
 				"message": "Failed to store price log",
 				"error":   err.Error(),
+				"data":    nil,
 			})
 			return
 		}
@@ -127,6 +135,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 			"success": true,
 			"message": "Price log created successfully",
 			"data":    priceLog,
+			"error":   nil,
 		})
 	}
 }

@@ -1,6 +1,6 @@
 -- +migrate Up
 
-CREATE TABLE transaction_detail (
+CREATE TABLE transaction_details (
     id SERIAL PRIMARY KEY,
     transaction_id INT REFERENCES transactions(id) ON DELETE CASCADE,
     product_id INT REFERENCES products(id) ON DELETE SET NULL,

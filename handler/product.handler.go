@@ -175,6 +175,7 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 					"success": false,
 					"message": "Product not found.",
 					"error":   err.Error(),
+					"data":    nil,
 				})
 				return
 			}
@@ -217,6 +218,7 @@ func DestroyProduct(db *gorm.DB) gin.HandlerFunc {
 					"success": false,
 					"message": "Product not found.",
 					"error":   err.Error(),
+				"data":    nil,
 				})
 				return
 			}
