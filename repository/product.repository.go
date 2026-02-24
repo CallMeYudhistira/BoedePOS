@@ -6,7 +6,17 @@ import (
 )
 
 func CreateProduct(db *gorm.DB, product *model.Product) error {
-	return db.Create(product).Error
+	return db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(product).Error; err != nil {
+			return err
+		}
+
+		if err := CreateInitialPriceLog(tx, product.ID, int(product.Price)); err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func GetProduct(db *gorm.DB, id uint) (model.Product, error) {

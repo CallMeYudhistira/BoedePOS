@@ -12,4 +12,4 @@ CREATE TABLE transaction_details (
 
 -- +migrate Down
 
-DROP TABLE IF EXISTS transaction_detail;
+DROP TABLE IF EXISTS transaction_details;

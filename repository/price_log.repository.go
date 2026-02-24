@@ -30,6 +30,16 @@ func StorePriceLog(db *gorm.DB, priceLog *model.PriceLog) error {
 	})
 }
 
+func CreateInitialPriceLog(tx *gorm.DB, productID uint, price int) error {
+	priceLog := model.PriceLog{
+		ProductID: productID,
+		OldPrice:  0,
+		NewPrice:  price,
+		CreatedAt: helper.NowLocale(),
+	}
+	return tx.Create(&priceLog).Error
+}
+
 func CheckPriceLogToday(db *gorm.DB, productID uint) error {
 	var existing model.PriceLog
 
