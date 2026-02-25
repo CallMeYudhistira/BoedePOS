@@ -14,7 +14,18 @@ import (
 
 func GetAllTransaction(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		transactions, err := repository.GetAllTransaction(db)
+		var filter model.DateFilter
+		if err := c.ShouldBindQuery(&filter); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid query parameters.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
+			return
+		}
+
+		transactions, err := repository.GetAllTransaction(db, filter)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
@@ -61,6 +72,16 @@ func StoreTransaction(db *gorm.DB) gin.HandlerFunc {
 
 		transaction, err := repository.CreateTransaction(db, &req)
 		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{
+					"success": false,
+					"message": "Product not found.",
+					"error":   err.Error(),
+					"data":    nil,
+				})
+				return
+			}
+
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Internal server error.",

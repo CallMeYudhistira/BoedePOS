@@ -25,9 +25,16 @@ func GetProduct(db *gorm.DB, id uint) (model.Product, error) {
 	return product, err
 }
 
-func GetAllProduct(db *gorm.DB) ([]model.Product, error) {
+func GetAllProduct(db *gorm.DB, filter model.ProductFilter) ([]model.Product, error) {
 	var products []model.Product
-	err := db.Preload("PriceLogs").Find(&products).Error
+	
+	query := db.Preload("PriceLogs")
+	
+	if filter.Name != "" {
+		query = query.Where("name ILIKE ?", "%"+filter.Name+"%")
+	}
+	
+	err := query.Find(&products).Error
 	return products, err
 }
 

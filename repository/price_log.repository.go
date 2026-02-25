@@ -6,9 +6,26 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetPriceLogs(db *gorm.DB, productID uint) ([]model.PriceLog, error) {
+func GetPriceLogs(db *gorm.DB, filter model.PriceLogFilter) ([]model.PriceLog, error) {
 	var priceLogs []model.PriceLog
-	err := db.Preload("Product").Where("product_id = ?", productID).Order("created_at desc").Find(&priceLogs).Error
+	query := db.Preload("Product").Order("created_at desc")
+
+	if filter.ProductID != 0 {
+		query = query.Where("product_id = ?", filter.ProductID)
+	}
+
+	if filter.Period != "" {
+		start, end := helper.GetPeriodRange(filter.Period)
+		if !start.IsZero() {
+			query = query.Where("created_at BETWEEN ? AND ?", start, end)
+		}
+	} else if filter.Date != "" {
+		query = query.Where("DATE(created_at) = ?", filter.Date)
+	} else if filter.StartDate != "" && filter.EndDate != "" {
+		query = query.Where("DATE(created_at) BETWEEN ? AND ?", filter.StartDate, filter.EndDate)
+	}
+
+	err := query.Find(&priceLogs).Error
 	return priceLogs, err
 }
 

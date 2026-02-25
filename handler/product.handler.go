@@ -14,7 +14,18 @@ import (
 
 func GetAllProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		products, err := repository.GetAllProduct(db)
+		var filter model.ProductFilter
+		if err := c.ShouldBindQuery(&filter); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid query parameters.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
+			return
+		}
+
+		products, err := repository.GetAllProduct(db, filter)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,

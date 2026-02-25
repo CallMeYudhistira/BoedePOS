@@ -14,26 +14,33 @@ import (
 
 func GetPriceLogs(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-
-			if err == gorm.ErrRecordNotFound {
-				c.JSON(http.StatusNotFound, gin.H{
-					"success": false,
-					"message": "Product not found.",
-					"error":   err.Error(),
-					"data":    nil,
-				})
-				return
-			}
-
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid product ID", "error": err.Error(), "data": nil})
+		var filter model.PriceLogFilter
+		if err := c.ShouldBindQuery(&filter); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid query parameters.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
 			return
 		}
 
-		priceLogs, err := repository.GetPriceLogs(db, uint(id))
+		// Backward compatibility: check if ID is passed in URL
+		if c.Param("id") != "" {
+			productID, err := strconv.Atoi(c.Param("id"))
+			if err == nil {
+				filter.ProductID = uint(productID)
+			}
+		}
+
+		priceLogs, err := repository.GetPriceLogs(db, filter)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to get price logs", "error": err.Error(), "data": nil})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false, 
+				"message": "Failed to get price logs", 
+				"error": err.Error(), 
+				"data": nil,
+			})
 			return
 		}
 
@@ -48,7 +55,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 
 		productID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"success": false,
 				"message": "Invalid product ID",
 				"error":   err.Error(),
@@ -59,7 +66,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 
 		if err := c.ShouldBindJSON(&priceLog); err != nil {
 			if ve, ok := err.(validator.ValidationErrors); ok {
-				c.JSON(http.StatusUnprocessableEntity, gin.H{
+				c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
 					"success": false,
 					"message": "Validation error",
 					"error":   helper.FormatValidationError(ve),
@@ -68,7 +75,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 				return
 			}
 
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"success": false,
 				"message": "Invalid request body",
 				"error":   err.Error(),
@@ -81,7 +88,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 
 		err = repository.CheckPriceLogToday(db, priceLog.ProductID)
 		if err == nil {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"success": false,
 				"message": "Product already has price update today",
 				"error":   nil,
@@ -90,7 +97,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		if err != gorm.ErrRecordNotFound {
-			c.JSON(http.StatusInternalServerError, gin.H{
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Database error",
 				"error":   err.Error(),
@@ -102,7 +109,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 		_, err = repository.GetProduct(db, priceLog.ProductID)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				c.JSON(http.StatusNotFound, gin.H{
+				c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 					"success": false,
 					"message": "Product not found.",
 					"error":   err.Error(),
@@ -121,7 +128,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		if err := repository.StorePriceLog(db, &priceLog); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Failed to store price log",
 				"error":   err.Error(),
@@ -130,7 +137,7 @@ func StorePriceLog(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		err = repository.FindPriceLog(db, &priceLog)
+		_ = repository.FindPriceLog(db, &priceLog)
 		c.JSON(http.StatusCreated, gin.H{
 			"success": true,
 			"message": "Price log created successfully",
