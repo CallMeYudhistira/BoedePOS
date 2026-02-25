@@ -13,4 +13,5 @@ func AddTransactionRouter(db *gorm.DB, rg *gin.RouterGroup) {
 	product.POST("/", handler.StoreTransaction(db))
 	product.GET("/:id", handler.FindTransaction(db))
 	product.DELETE("/:id", handler.DestroyTransaction(db))
+	rg.GET("/reports", handler.GetSalesReport(db))
 }

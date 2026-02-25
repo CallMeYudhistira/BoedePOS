@@ -3,7 +3,7 @@ package model
 type Product struct {
 	ID         uint                `json:"id" gorm:"primaryKey"`
 	Name       string              `json:"name" binding:"required,min=3"`
-	Price      int64               `json:"price" binding:"required,min=1"`
+	Price      int64               `json:"price" binding:"required,min=1"`      // Selling price
 	IsFraction bool                `json:"is_fraction"`
 
 	PriceLogs  []PriceLog          `json:"price_logs,omitempty" gorm:"foreignKey:ProductID"`

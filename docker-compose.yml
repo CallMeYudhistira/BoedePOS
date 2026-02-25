@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: boedepos_db
+    restart: always
+    environment:
+      POSTGRES_USER: boedepos
+      POSTGRES_PASSWORD: boedepos
+      POSTGRES_DB: boedepos
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U boedepos -d boedepos"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - boedepos_net
+
+  app:
+    build: .
+    image: boedee_api
+    container_name: boedepos_app
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "1001:1001"
+    environment:
+      APP_PORT: :1001
+      DATABASE_DSN: postgres://boedepos:boedepos@db:5432/boedepos?sslmode=disable
+      DB_PROVIDER: postgres
+      LOCALE: Asia/Jakarta
+    networks:
+      - boedepos_net
+
+networks:
+  boedepos_net:
+    driver: bridge
+
+volumes:
+  pgdata:

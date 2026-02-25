@@ -198,3 +198,36 @@ func DestroyTransaction(db *gorm.DB) gin.HandlerFunc {
 		})
 	}
 }
+
+func GetSalesReport(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var filter model.DateFilter
+		if err := c.ShouldBindQuery(&filter); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid query parameters.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
+			return
+		}
+
+		report, err := repository.GetSalesReport(db, filter)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "Internal server error.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"message": nil,
+			"error":   nil,
+			"data":    report,
+		})
+	}
+}

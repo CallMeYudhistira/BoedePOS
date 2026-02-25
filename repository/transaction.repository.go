@@ -71,7 +71,7 @@ func CreateTransaction(db *gorm.DB, req *model.TransactionRequest) (model.Transa
 			productMap[p.ID] = p
 		}
 
-		// 3. Initialize Transaction (Total and Change are not stored anymore)
+		// 3. Initialize Transaction
 		transaction = model.Transaction{
 			Pay:       req.Pay,
 			CreatedAt: helper.NowLocale(),
@@ -142,4 +142,62 @@ func FindTransaction(db *gorm.DB, id uint) (model.Transaction, error) {
 
 func DeleteTransaction(db *gorm.DB, id uint) error {
 	return db.Delete(&model.Transaction{}, id).Error
+}
+
+func GetSalesReport(db *gorm.DB, filter model.DateFilter) (model.SalesReport, error) {
+	var report model.SalesReport
+	var transactions []model.Transaction
+
+	query := db.Preload("TransactionDetails")
+
+	if filter.Period != "" {
+		start, end := helper.GetPeriodRange(filter.Period)
+		if !start.IsZero() {
+			query = query.Where("created_at BETWEEN ? AND ?", start, end)
+		}
+	} else if filter.Date != "" {
+		query = query.Where("DATE(created_at) = ?", filter.Date)
+	} else if filter.StartDate != "" && filter.EndDate != "" {
+		query = query.Where("DATE(created_at) BETWEEN ? AND ?", filter.StartDate, filter.EndDate)
+	}
+
+	if err := query.Find(&transactions).Error; err != nil {
+		return report, err
+	}
+
+	report.TotalTransactions = len(transactions)
+
+	type productStats struct {
+		qty      int
+		turnover int64
+	}
+	statsMap := make(map[string]*productStats)
+
+	for _, t := range transactions {
+		for _, d := range t.TransactionDetails {
+			report.TotalTurnover += d.Subtotal
+			report.TotalItemsSold += d.Qty
+
+			if _, ok := statsMap[d.ProductName]; !ok {
+				statsMap[d.ProductName] = &productStats{}
+			}
+			statsMap[d.ProductName].qty += d.Qty
+			statsMap[d.ProductName].turnover += d.Subtotal
+		}
+	}
+
+	var maxQty int
+	for name, stats := range statsMap {
+		if stats.qty > maxQty {
+			maxQty = stats.qty
+			if report.MostSoldProduct == nil {
+				report.MostSoldProduct = &model.MostSoldProduct{}
+			}
+			report.MostSoldProduct.Name = name
+			report.MostSoldProduct.Qty = stats.qty
+			report.MostSoldProduct.Turnover = stats.turnover
+		}
+	}
+
+	return report, nil
 }

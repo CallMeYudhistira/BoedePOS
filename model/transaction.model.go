@@ -15,5 +15,5 @@ type Transaction struct {
 
 type TransactionRequest struct {
 	Pay   int64                      `json:"pay" binding:"required,min=1"`
-	Items []TransactionDetailRequest `json:"items" binding:"required,dive,min=1"`
+	Items []TransactionDetailRequest `json:"items" binding:"required,min=1,dive"`
 }
