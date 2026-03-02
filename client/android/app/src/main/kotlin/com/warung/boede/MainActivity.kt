@@ -1,4 +1,4 @@
-package com.example.boede_app
+package com.warung.boede
 
 import io.flutter.embedding.android.FlutterActivity
 
