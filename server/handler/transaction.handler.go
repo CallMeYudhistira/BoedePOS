@@ -106,9 +106,9 @@ func FindTransaction(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"success": false,
-				"message": "Internal server error.",
+				"message": "Invalid transaction ID format.",
 				"error":   err.Error(),
 				"data":    nil,
 			})
@@ -149,9 +149,9 @@ func DestroyTransaction(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"success": false,
-				"message": "Internal server error.",
+				"message": "Invalid transaction ID format.",
 				"error":   err.Error(),
 				"data":    nil,
 			})

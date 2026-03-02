@@ -104,9 +104,9 @@ func FindProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"success": false,
-				"message": "Internal server error.",
+				"message": "Invalid product ID format.",
 				"error":   err.Error(),
 				"data":    nil,
 			})
@@ -146,9 +146,17 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var product model.Product
 		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid product ID format.",
+				"error":   err.Error(),
+				"data":    nil,
+			})
+			return
+		}
 
 		if err := c.ShouldBindJSON(&product); err != nil {
-
 			if ve, ok := err.(validator.ValidationErrors); ok {
 				c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
 					"success": false,
@@ -213,9 +221,9 @@ func DestroyProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"success": false,
-				"message": "Internal server error.",
+				"message": "Invalid product ID format.",
 				"error":   err.Error(),
 				"data":    nil,
 			})

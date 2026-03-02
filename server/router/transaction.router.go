@@ -7,11 +7,11 @@ import (
 )
 
 func AddTransactionRouter(db *gorm.DB, rg *gin.RouterGroup) {
-	product := rg.Group("/transactions")
+	transaction := rg.Group("/transactions")
 
-	product.GET("/", handler.GetAllTransaction(db))
-	product.POST("/", handler.StoreTransaction(db))
-	product.GET("/:id", handler.FindTransaction(db))
-	product.DELETE("/:id", handler.DestroyTransaction(db))
-	rg.GET("/reports", handler.GetSalesReport(db))
+	transaction.GET("/", handler.GetAllTransaction(db))
+	transaction.POST("/", handler.StoreTransaction(db))
+	transaction.GET("/reports", handler.GetSalesReport(db))
+	transaction.GET("/:id", handler.FindTransaction(db))
+	transaction.DELETE("/:id", handler.DestroyTransaction(db))
 }
