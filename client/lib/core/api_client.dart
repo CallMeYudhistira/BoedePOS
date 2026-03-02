@@ -29,7 +29,7 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error or timeout');
+      NavigationService.showSnackbar('Connection error: ${e.toString()}');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }
@@ -46,7 +46,7 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error or timeout');
+      NavigationService.showSnackbar('Connection error: ${e.toString()}');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }
@@ -63,7 +63,7 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error or timeout');
+      NavigationService.showSnackbar('Connection error: ${e.toString()}');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }
@@ -78,7 +78,7 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error or timeout');
+      NavigationService.showSnackbar('Connection error: ${e.toString()}');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }

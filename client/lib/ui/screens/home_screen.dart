@@ -49,20 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
                       'icon_launch.jpeg',
-                      height: 60,
-                      width: 60,
+                      height: 120,
+                      width: 120,
                       fit: BoxFit.cover,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Menu BoedePOS',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ],
               ),
             ),

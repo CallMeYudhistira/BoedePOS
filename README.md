@@ -85,8 +85,5 @@ flutter build apk --release
 ```
 File akan tersedia di: `build/app/outputs/flutter-apk/app-release.apk`
 
-## 📝 Lisensi
-Proyek ini dilisensikan di bawah [MIT License](LICENSE).
-
 ---
 *Dibuat dengan ❤️ untuk kemajuan UMKM Indonesia.*
