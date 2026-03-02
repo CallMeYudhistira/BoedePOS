@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../core/constants.dart';
@@ -33,11 +34,30 @@ class _PosScreenState extends State<PosScreen> {
   }
 
   void _onProductTap(Product product) {
-    // ... rest of method unchanged
+    if (product.isFraction) {
+      showDialog(
+        context: context,
+        builder: (context) => FractionModal(product: product),
+      );
+    } else {
+      context.read<CartProvider>().addToCart(product);
+      Fluttertoast.showToast(
+        msg: "${product.name} ditambahkan ke keranjang",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black87,
+        textColor: Colors.white,
+      );
+    }
   }
 
   void _showCartSheet(BuildContext context) {
-    // ... rest of method unchanged
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const CartSheetContent(),
+    );
   }
 
   @override

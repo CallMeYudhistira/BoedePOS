@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
 
@@ -36,6 +37,13 @@ class _FractionModalState extends State<FractionModal> {
           onPressed: () {
             int customPrice = int.tryParse(_priceController.text) ?? widget.product.price;
             context.read<CartProvider>().addToCart(widget.product, customPrice: customPrice);
+            Fluttertoast.showToast(
+              msg: "${widget.product.name} ditambahkan ke keranjang",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              backgroundColor: Colors.black87,
+              textColor: Colors.white,
+            );
             Navigator.pop(context);
           },
           child: const Text('Tambah ke Keranjang'),
