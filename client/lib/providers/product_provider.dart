@@ -5,9 +5,26 @@ import '../models/product.dart';
 class ProductProvider with ChangeNotifier {
   List<Product> _products = [];
   bool _isInitialLoading = true;
+  String _searchQuery = '';
+  Map<String, String> _validationErrors = {};
 
-  List<Product> get products => _products;
+  List<Product> get products {
+    if (_searchQuery.isEmpty) return _products;
+    return _products.where((p) => p.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+  }
+  
   bool get isLoading => _isInitialLoading && _products.isEmpty;
+  Map<String, String> get validationErrors => _validationErrors;
+
+  void clearValidationErrors() {
+    _validationErrors = {};
+    notifyListeners();
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
 
   Future<void> fetchProducts() async {
     try {
@@ -16,13 +33,15 @@ class ProductProvider with ChangeNotifier {
         _products = (res['data'] as List).map((p) => Product.fromJson(p)).toList();
       }
     } catch (e) {
-      print('Failed to fetch products: $e');
+      debugPrint('Failed to fetch products: $e');
     }
     _isInitialLoading = false;
     notifyListeners();
   }
 
   Future<bool> addProduct(String name, int price, bool isFraction) async {
+    _validationErrors = {};
+    notifyListeners();
     try {
       final res = await ApiClient.post('/products', {
         'name': name,
@@ -32,14 +51,19 @@ class ProductProvider with ChangeNotifier {
       if (res['success'] == true) {
         await fetchProducts();
         return true;
+      } else if (res['error'] is Map) {
+        _validationErrors = Map<String, String>.from(res['error']);
+        notifyListeners();
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     return false;
   }
 
   Future<bool> updateProduct(int id, String name, int price, bool isFraction) async {
+    _validationErrors = {};
+    notifyListeners();
     try {
       final res = await ApiClient.put('/products/$id', {
         'name': name,
@@ -49,9 +73,12 @@ class ProductProvider with ChangeNotifier {
       if (res['success'] == true) {
         await fetchProducts();
         return true;
+      } else if (res['error'] is Map) {
+        _validationErrors = Map<String, String>.from(res['error']);
+        notifyListeners();
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     return false;
   }
@@ -64,7 +91,7 @@ class ProductProvider with ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     return false;
   }

@@ -18,19 +18,19 @@ class _FractionModalState extends State<FractionModal> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Select Price for ${widget.product.name}'),
+      title: Text('Pilih Harga untuk ${widget.product.name}'),
       content: TextField(
         controller: _priceController,
         keyboardType: TextInputType.number,
         decoration: const InputDecoration(
-          labelText: 'Custom Price',
+          labelText: 'Harga Kustom',
           border: OutlineInputBorder(),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text('Batal'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -38,7 +38,7 @@ class _FractionModalState extends State<FractionModal> {
             context.read<CartProvider>().addToCart(widget.product, customPrice: customPrice);
             Navigator.pop(context);
           },
-          child: const Text('Add to Cart'),
+          child: const Text('Tambah ke Keranjang'),
         ),
       ],
     );

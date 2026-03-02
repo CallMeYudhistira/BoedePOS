@@ -1,21 +1,22 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'navigation_service.dart';
 import 'constants.dart';
 
 class ApiClient {
   static const int timeoutSeconds = 15;
 
   static void _logRequest(String method, String endpoint, {Map<String, dynamic>? body}) {
-    developer.log('[$method] ${AppConstants.baseUrl}$endpoint', name: 'API_REQ');
+    debugPrint('API_REQ: [$method] ${AppConstants.baseUrl}$endpoint');
     if (body != null) {
-      developer.log('BODY: ${jsonEncode(body)}', name: 'API_REQ');
+      debugPrint('API_REQ_BODY: ${jsonEncode(body)}');
     }
   }
 
   static void _logResponse(http.Response response) {
-    developer.log('[${response.statusCode}] ${response.request?.url}', name: 'API_RES');
-    developer.log('BODY: ${response.body}', name: 'API_RES');
+    debugPrint('API_RES: [${response.statusCode}] ${response.request?.url}');
+    debugPrint('API_RES_BODY: ${response.body}');
   }
 
   static Future<dynamic> get(String endpoint) async {
@@ -27,7 +28,8 @@ class ApiClient {
       _logResponse(response);
       return _handleResponse(response);
     } catch (e) {
-      developer.log('ERROR: $e', name: 'API_ERR');
+      debugPrint('API_ERR: $e');
+      NavigationService.showSnackbar('Connection error or timeout');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }
@@ -43,7 +45,8 @@ class ApiClient {
       _logResponse(response);
       return _handleResponse(response);
     } catch (e) {
-      developer.log('ERROR: $e', name: 'API_ERR');
+      debugPrint('API_ERR: $e');
+      NavigationService.showSnackbar('Connection error or timeout');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }
@@ -59,7 +62,8 @@ class ApiClient {
       _logResponse(response);
       return _handleResponse(response);
     } catch (e) {
-      developer.log('ERROR: $e', name: 'API_ERR');
+      debugPrint('API_ERR: $e');
+      NavigationService.showSnackbar('Connection error or timeout');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }
@@ -73,25 +77,41 @@ class ApiClient {
       _logResponse(response);
       return _handleResponse(response);
     } catch (e) {
-      developer.log('ERROR: $e', name: 'API_ERR');
+      debugPrint('API_ERR: $e');
+      NavigationService.showSnackbar('Connection error or timeout');
       return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
     }
   }
 
   static dynamic _handleResponse(http.Response response) {
+    dynamic decoded;
+    try {
+      decoded = jsonDecode(response.body);
+    } catch (_) {
+      NavigationService.showSnackbar('API Error: ${response.statusCode}');
+      return {
+        'success': false,
+        'message': 'API Error: ${response.statusCode}',
+        'error': response.body,
+      };
+    }
+
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return jsonDecode(response.body);
+      return decoded;
     } else {
-      // Prevent throwing an exception so the app doesn't freeze
-      try {
-        return jsonDecode(response.body);
-      } catch (_) {
-        return {
-          'success': false,
-          'message': 'API Error: ${response.statusCode}',
-          'error': response.body,
-        };
+      if (response.statusCode == 422) {
+        // Validation error, don't show snackbar here as it will be shown under fields
+        NavigationService.showSnackbar(decoded['message'] ?? 'Validation error');
+      } else {
+        String errorMessage = 'API Error: ${response.statusCode}';
+        if (decoded['message'] is String && decoded['message'].isNotEmpty) {
+          errorMessage = decoded['message'];
+        } else if (decoded['error'] is String && decoded['error'].isNotEmpty) {
+          errorMessage = decoded['error'];
+        }
+        NavigationService.showSnackbar(errorMessage);
       }
+      return decoded;
     }
   }
 }

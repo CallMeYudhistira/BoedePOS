@@ -6,11 +6,13 @@ class ReportProvider with ChangeNotifier {
   SalesReport? _dailyReport;
   SalesReport? _weeklyReport;
   SalesReport? _monthlyReport;
+  SalesReport? _yearlyReport;
   bool _isInitialLoading = true;
 
   SalesReport? get dailyReport => _dailyReport;
   SalesReport? get weeklyReport => _weeklyReport;
   SalesReport? get monthlyReport => _monthlyReport;
+  SalesReport? get yearlyReport => _yearlyReport;
   bool get isLoading => _isInitialLoading && _dailyReport == null;
 
   Future<void> fetchReports() async {
@@ -19,6 +21,7 @@ class ReportProvider with ChangeNotifier {
         ApiClient.get('/transactions/reports?period=daily'),
         ApiClient.get('/transactions/reports?period=weekly'),
         ApiClient.get('/transactions/reports?period=monthly'),
+        ApiClient.get('/transactions/reports?period=yearly'),
       ]);
 
       if (results[0]['success'] == true) {
@@ -30,8 +33,11 @@ class ReportProvider with ChangeNotifier {
       if (results[2]['success'] == true) {
         _monthlyReport = SalesReport.fromJson(results[2]['data']);
       }
+      if (results[3]['success'] == true) {
+        _yearlyReport = SalesReport.fromJson(results[3]['data']);
+      }
     } catch (e) {
-      print('Failed to fetch reports: $e');
+      debugPrint('Failed to fetch reports: $e');
     }
     _isInitialLoading = false;
     notifyListeners();

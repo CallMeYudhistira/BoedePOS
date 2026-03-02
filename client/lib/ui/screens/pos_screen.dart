@@ -33,7 +33,7 @@ class _PosScreenState extends State<PosScreen> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${product.name} added to cart!'),
+          content: Text('${product.name} ditambahkan ke keranjang!'),
           duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
         ),
@@ -62,7 +62,7 @@ class _PosScreenState extends State<PosScreen> {
             return const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor));
           }
           if (provider.products.isEmpty) {
-            return const Center(child: Text("No products available."));
+            return const Center(child: Text("Produk tidak tersedia."));
           }
           return RefreshIndicator(
             onRefresh: () => provider.fetchProducts(),
@@ -119,12 +119,22 @@ class _PosScreenState extends State<PosScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          product.isFraction ? 'Fraction Item' : AppConstants.currencyFormat.format(product.price),
-                          style: TextStyle(
-                            color: product.isFraction ? Colors.orange : AppConstants.textLightColor,
-                            fontWeight: FontWeight.w600,
+                          AppConstants.currencyFormat.format(product.price),
+                          style: const TextStyle(
+                            color: AppConstants.textLightColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
+                        if (product.isFraction) 
+                          const Text(
+                            'Barang Pecahan',
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -164,7 +174,7 @@ class _PosScreenState extends State<PosScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${cart.items.fold(0, (sum, i) => sum + i.qty)} Items', 
+                  '${cart.items.fold(0, (sum, i) => sum + i.qty)} Barang', 
                   style: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w600),
                 ),
                 Text(
@@ -176,13 +186,13 @@ class _PosScreenState extends State<PosScreen> {
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConstants.primaryColor,
-                foregroundColor: AppConstants.textDarkColor,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               onPressed: () => _showCartSheet(context),
               icon: const Icon(Icons.shopping_cart),
-              label: const Text('View Cart', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              label: const Text('Lihat Keranjang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             )
           ],
         ),
@@ -200,6 +210,7 @@ class CartSheetContent extends StatefulWidget {
 
 class _CartSheetContentState extends State<CartSheetContent> {
   final _paymentController = TextEditingController();
+  String? _paymentError;
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +249,7 @@ class _CartSheetContentState extends State<CartSheetContent> {
                 width: double.infinity,
                 padding: const EdgeInsets.only(bottom: 16),
                 child: const Text(
-                  'Your Cart', 
+                  'Keranjang Anda', 
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor),
                 ),
@@ -247,7 +258,7 @@ class _CartSheetContentState extends State<CartSheetContent> {
                 child: Consumer<CartProvider>(
                   builder: (context, cartProvider, child) {
                     if (cartProvider.items.isEmpty) {
-                      return const Center(child: Text('Cart is empty.'));
+                      return const Center(child: Text('Keranjang kosong.'));
                     }
                     return ListView.builder(
                       padding: const EdgeInsets.all(16),
@@ -304,7 +315,7 @@ class _CartSheetContentState extends State<CartSheetContent> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Total Amount', style: TextStyle(fontSize: 16, color: AppConstants.textLightColor)),
+                            const Text('Total Harga', style: TextStyle(fontSize: 16, color: AppConstants.textLightColor)),
                             Text(
                               AppConstants.currencyFormat.format(cartProvider.totalAmount), 
                               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor),
@@ -316,9 +327,15 @@ class _CartSheetContentState extends State<CartSheetContent> {
                           controller: _paymentController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: false),
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          onChanged: (val) {
+                            if (_paymentError != null) {
+                              setState(() => _paymentError = null);
+                            }
+                          },
                           decoration: InputDecoration(
-                            labelText: 'Customer Payment (Rp)',
+                            labelText: 'Pembayaran Pelanggan (Rp)',
                             labelStyle: const TextStyle(color: AppConstants.textLightColor),
+                            errorText: _paymentError,
                             filled: true,
                             fillColor: AppConstants.backgroundColor,
                             border: OutlineInputBorder(
@@ -342,25 +359,29 @@ class _CartSheetContentState extends State<CartSheetContent> {
                                 ? null
                                 : () async {
                                     final payAmount = int.tryParse(_paymentController.text) ?? 0;
+                                    if (payAmount == 0) {
+                                      setState(() => _paymentError = 'Harap masukkan jumlah pembayaran');
+                                      return;
+                                    }
                                     if (payAmount < cartProvider.totalAmount) {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Insufficient Payment!')));
+                                      setState(() => _paymentError = 'Pembayaran tidak cukup!');
                                       return;
                                     }
                                     bool success = await cartProvider.checkout(payAmount);
                                     if (success) {
                                       if (context.mounted) {
                                         Navigator.pop(context);
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checkout Success!')));
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checkout Berhasil!')));
                                       }
                                     } else {
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checkout Failed!')));
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checkout Gagal!')));
                                       }
                                     }
                                   },
                             child: cartProvider.isCheckingOut 
                               ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                              : const Text('Process Checkout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              : const Text('Proses Checkout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           ),
                         ),
                       ],

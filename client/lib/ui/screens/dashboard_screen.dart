@@ -37,12 +37,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.all(16.0),
               children: [
                 const Text(
-                  "Today's Summary",
+                  "Ringkasan Hari Ini",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor),
                 ),
                 const SizedBox(height: 16),
                 _buildStatCard(
-                  'Total Revenue', 
+                  'Total Pendapatan', 
                   AppConstants.currencyFormat.format(daily?.totalTurnover ?? 0), 
                   Icons.monetization_on_rounded,
                   isPrimary: true,
@@ -50,9 +50,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: _buildStatCard('Transactions', '${daily?.totalTransactions ?? 0}', Icons.receipt_long_rounded)),
+                    Expanded(child: _buildStatCard('Transaksi', '${daily?.totalTransactions ?? 0}', Icons.receipt_long_rounded)),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildStatCard('Products Sold', '${daily?.totalItemsSold ?? 0}', Icons.shopping_bag_rounded)),
+                    Expanded(child: _buildStatCard('Produk Terjual', '${daily?.totalItemsSold ?? 0}', Icons.shopping_bag_rounded)),
                   ],
                 ),
               ],
@@ -87,14 +87,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 title, 
                 style: TextStyle(
                   fontSize: 16, 
-                  color: isPrimary ? AppConstants.textDarkColor.withOpacity(0.8) : AppConstants.textLightColor,
+                  color: isPrimary ? Colors.white70 : AppConstants.textLightColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Icon(
                 icon, 
                 size: 28, 
-                color: isPrimary ? AppConstants.textDarkColor : AppConstants.primaryColor,
+                color: isPrimary ? Colors.white : AppConstants.primaryColor,
               ),
             ],
           ),
@@ -104,7 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: TextStyle(
               fontSize: isPrimary ? 32 : 24, 
               fontWeight: FontWeight.bold, 
-              color: AppConstants.textDarkColor,
+              color: isPrimary ? Colors.white : AppConstants.textDarkColor,
             ),
           ),
         ],

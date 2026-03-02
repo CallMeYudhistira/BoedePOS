@@ -36,11 +36,13 @@ class _ReportScreenState extends State<ReportScreen> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildReportSection('Daily Income', provider.dailyReport, Icons.today),
+                _buildReportSection('Pendapatan Harian', provider.dailyReport, Icons.today),
                 const SizedBox(height: 16),
-                _buildReportSection('Weekly Income', provider.weeklyReport, Icons.date_range),
+                _buildReportSection('Pendapatan Mingguan', provider.weeklyReport, Icons.date_range),
                 const SizedBox(height: 16),
-                _buildReportSection('Monthly Income', provider.monthlyReport, Icons.calendar_month),
+                _buildReportSection('Pendapatan Bulanan', provider.monthlyReport, Icons.calendar_month),
+                const SizedBox(height: 16),
+                _buildReportSection('Pendapatan Tahunan', provider.yearlyReport, Icons.calendar_month),
                 const SizedBox(height: 40),
               ],
             ),
@@ -83,12 +85,12 @@ class _ReportScreenState extends State<ReportScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildStatRow('Total Turnover', AppConstants.currencyFormat.format(report.totalTurnover), isHighlight: true),
+          _buildStatRow('Total Omzet', AppConstants.currencyFormat.format(report.totalTurnover), isHighlight: true),
           const Divider(height: 30),
-          _buildStatRow('Total Transactions', '${report.totalTransactions}'),
-          _buildStatRow('Items Sold', '${report.totalItemsSold}'),
+          _buildStatRow('Total Transaksi', '${report.totalTransactions}'),
+          _buildStatRow('Barang Terjual', '${report.totalItemsSold}'),
           if (report.mostSoldProductName != null)
-            _buildStatRow('Top Product', '${report.mostSoldProductName} (${report.mostSoldProductQty}x)'),
+            _buildStatRow('Produk Terlaris', '${report.mostSoldProductName} (${report.mostSoldProductQty}x)'),
         ],
       ),
     );

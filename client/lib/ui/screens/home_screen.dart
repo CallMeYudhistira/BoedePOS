@@ -5,6 +5,7 @@ import 'pos_screen.dart';
 import 'history_screen.dart';
 import 'product_screen.dart';
 import 'report_screen.dart';
+import 'price_logs_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const PosScreen(),
     const HistoryScreen(),
     const ProductScreen(),
+    const PriceLogsScreen(),
     const ReportScreen(),
   ];
 
@@ -30,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('BoedePOS'),
         backgroundColor: AppConstants.primaryColor,
-        foregroundColor: AppConstants.textDarkColor,
+        foregroundColor: Colors.white, // Since primary is dark blue
       ),
       drawer: Drawer(
         child: ListView(
@@ -41,19 +43,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: AppConstants.primaryColor,
               ),
               child: Text(
-                'BoedePOS Menu',
+                'Menu BoedePOS',
                 style: TextStyle(
-                  color: AppConstants.textDarkColor,
+                  color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            _buildDrawerItem(Icons.dashboard, 'Dashboard', 0),
-            _buildDrawerItem(Icons.point_of_sale, 'Transaction (POS)', 1),
-            _buildDrawerItem(Icons.history, 'Transaction History', 2),
-            _buildDrawerItem(Icons.inventory, 'Product Management', 3),
-            _buildDrawerItem(Icons.analytics, 'Reports', 4),
+            _buildDrawerItem(Icons.dashboard, 'Beranda', 0),
+            _buildDrawerItem(Icons.point_of_sale, 'Transaksi (POS)', 1),
+            _buildDrawerItem(Icons.history, 'Riwayat Transaksi', 2),
+            _buildDrawerItem(Icons.inventory, 'Manajemen Produk', 3),
+            _buildDrawerItem(Icons.price_change, 'Monitoring Harga', 4),
+            _buildDrawerItem(Icons.analytics, 'Laporan', 5),
           ],
         ),
       ),

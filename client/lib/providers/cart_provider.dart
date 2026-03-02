@@ -78,7 +78,7 @@ class CartProvider with ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
 
     _isCheckingOut = false;

@@ -6,7 +6,9 @@ import 'providers/product_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/transaction_provider.dart';
 import 'providers/report_provider.dart';
+import 'providers/price_log_provider.dart';
 import 'ui/screens/home_screen.dart';
+import 'core/navigation_service.dart';
 
 void main() {
   runApp(const BoedePOSApp());
@@ -23,13 +25,16 @@ class BoedePOSApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
+        ChangeNotifierProvider(create: (_) => PriceLogProvider()),
       ],
       child: MaterialApp(
         title: 'BoedePOS',
         debugShowCheckedModeBanner: false,
+        navigatorKey: NavigationService.navigatorKey,
+        scaffoldMessengerKey: NavigationService.messengerKey,
         theme: ThemeData(
           textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFC8F560)),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F678A)),
           useMaterial3: true,
         ),
         home: const HomeScreen(),
