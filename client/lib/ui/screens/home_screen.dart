@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       selected: _selectedIndex == index,
-      selectedTileColor: AppConstants.primaryColor.withOpacity(0.1),
+      selectedTileColor: AppConstants.primaryColor.withValues(alpha: 0.1),
       onTap: () {
         setState(() {
           _selectedIndex = index;

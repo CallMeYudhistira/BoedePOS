@@ -60,7 +60,7 @@ class _ReportScreenState extends State<ReportScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -75,7 +75,7 @@ class _ReportScreenState extends State<ReportScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppConstants.primaryColor.withOpacity(0.2),
+                  color: AppConstants.primaryColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: AppConstants.textDarkColor),
@@ -108,7 +108,7 @@ class _ReportScreenState extends State<ReportScreen> {
             style: TextStyle(
               fontSize: isHighlight ? 20 : 16, 
               fontWeight: isHighlight ? FontWeight.bold : FontWeight.w600, 
-              color: isHighlight ? AppConstants.textDarkColor : AppConstants.textDarkColor.withOpacity(0.8),
+              color: isHighlight ? AppConstants.textDarkColor : AppConstants.textDarkColor.withValues(alpha: 0.8),
             ),
           ),
         ],

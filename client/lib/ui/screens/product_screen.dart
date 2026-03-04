@@ -190,7 +190,7 @@ class _ProductScreenState extends State<ProductScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: Colors.black.withValues(alpha: 0.03),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             )
@@ -199,7 +199,7 @@ class _ProductScreenState extends State<ProductScreen> {
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                           leading: CircleAvatar(
-                            backgroundColor: p.isFraction ? Colors.orange.withOpacity(0.1) : AppConstants.primaryColor.withOpacity(0.2),
+                            backgroundColor: p.isFraction ? Colors.orange.withValues(alpha: 0.1) : AppConstants.primaryColor.withValues(alpha: 0.2),
                             child: Icon(
                               p.isFraction ? Icons.scale : Icons.inventory_2,
                               color: p.isFraction ? Colors.orange : AppConstants.textDarkColor,

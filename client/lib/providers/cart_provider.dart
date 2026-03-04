@@ -4,7 +4,7 @@ import '../models/cart_item.dart';
 import '../models/product.dart';
 
 class CartProvider with ChangeNotifier {
-  List<CartItem> _items = [];
+  final List<CartItem> _items = [];
   bool _isCheckingOut = false;
 
   List<CartItem> get items => _items;

@@ -5,7 +5,6 @@ import '../../providers/price_log_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../core/constants.dart';
 import '../../core/navigation_service.dart';
-import '../../models/price_log.dart';
 import '../../models/product.dart';
 
 class PriceLogsScreen extends StatefulWidget {
@@ -136,7 +135,7 @@ class _PriceLogsScreenState extends State<PriceLogsScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
+                              color: Colors.black.withValues(alpha: 0.04),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             )
@@ -147,10 +146,10 @@ class _PriceLogsScreenState extends State<PriceLogsScreen> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                           leading: CircleAvatar(
                             backgroundColor: isUp
-                                ? Colors.red.withOpacity(0.1)
+                                ? Colors.red.withValues(alpha: 0.1)
                                 : isDown
-                                    ? Colors.green.withOpacity(0.1)
-                                    : Colors.grey.withOpacity(0.1),
+                                    ? Colors.green.withValues(alpha: 0.1)
+                                    : Colors.grey.withValues(alpha: 0.1),
                             child: Icon(
                               isUp
                                   ? Icons.trending_up

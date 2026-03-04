@@ -116,7 +116,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
+                              color: Colors.black.withValues(alpha: 0.04),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             )
@@ -128,7 +128,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             leading: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: AppConstants.primaryColor.withOpacity(0.2),
+                                color: AppConstants.primaryColor.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.receipt_long_rounded, color: AppConstants.textDarkColor),

@@ -1,4 +1,4 @@
-# BoedePOS - Sistem Point of Sale (Kasir) Modern
+# BoedePOS - Sistem Point of Sale (Kasir)
 
 BoedePOS adalah solusi Point of Sale (POS) mobile-first yang dirancang untuk efisiensi manajemen warung atau toko retail kecil. Proyek ini terdiri dari aplikasi mobile Flutter yang elegan dan API backend Go yang tangguh.
 
@@ -13,7 +13,6 @@ BoedePOS adalah solusi Point of Sale (POS) mobile-first yang dirancang untuk efi
 - **Manajemen Produk:** CRUD data produk lengkap dengan identitas ID dan label jenis produk.
 - **Monitoring Harga:** Pantau kenaikan atau penurunan harga produk dengan grafik tren sederhana.
 - **Laporan Penjualan:** Statistik pendapatan harian, mingguan, bulanan, hingga tahunan.
-- **UI/UX Modern:** Desain biru profesional (#0F678A), animasi transisi halus, dan notifikasi top-down.
 
 ### ⚙️ Backend API (Go)
 - **Arsitektur Bersih:** Pemisahan layer handler, repository, dan model.
@@ -25,7 +24,7 @@ BoedePOS adalah solusi Point of Sale (POS) mobile-first yang dirancang untuk efi
 
 | Komponen | Teknologi |
 | --- | --- |
-| **Aplikasi Mobile** | Flutter, Provider, HTTP, Google Fonts, Intl |
+| **Aplikasi Mobile** | Flutter, Provider, HTTP |
 | **Backend API** | Go (Golang), Gin Gonic, GORM |
 | **Database** | PostgreSQL |
 | **DevOps** | Docker, Docker Compose |
@@ -54,7 +53,7 @@ BoedePOS/
 ### Prasyarat
 - [Flutter SDK](https://docs.flutter.dev/get-started/install)
 - [Go (Golang)](https://go.dev/doc/install)
-- [Docker](https://docs.docker.com/get-started/) (Opsional untuk Backend)
+- [Docker](https://docs.docker.com/get-started/)
 
 ### Setup Backend (Server)
 1. Masuk ke direktori server: `cd server`
