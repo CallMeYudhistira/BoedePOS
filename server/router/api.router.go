@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/CallMeYudhistira/BoedePOS/config"
+	"github.com/CallMeYudhistira/BoedePOS/middleware"
 	"gorm.io/gorm"
 
 	"github.com/gin-contrib/cors"
@@ -20,6 +21,9 @@ func StartServer(db *gorm.DB) *gin.Engine {
 	// ROUTER
 	// =====================
 	api := r.Group("/api")
+
+	// Apply API Key Middleware
+	api.Use(middleware.APIKeyMiddleware())
 
 	api.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "BoedePOS running 🚀"})

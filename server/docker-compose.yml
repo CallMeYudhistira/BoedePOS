@@ -3,16 +3,18 @@ services:
     image: postgres:16-alpine
     container_name: boedepos_db
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: boedepos
-      POSTGRES_PASSWORD: boedepos
-      POSTGRES_DB: boedepos
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "3302:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U boedepos -d boedepos"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -29,11 +31,10 @@ services:
         condition: service_healthy
     ports:
       - "1001:1001"
-    environment:
-      APP_PORT: :1001
-      DATABASE_DSN: postgres://boedepos:boedepos@db:5432/boedepos?sslmode=disable
-      DB_PROVIDER: postgres
-      LOCALE: Asia/Jakarta
+    env_file:
+      - .env
+    volumes:
+      - ./.env:/app/.env
     networks:
       - boedepos_net
 

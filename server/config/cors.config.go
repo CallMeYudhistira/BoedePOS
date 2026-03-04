@@ -11,7 +11,7 @@ func CorsConfig() cors.Config {
 			"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS",
 		},
 		AllowHeaders: []string{
-			"Content-Type",
+			"Content-Type", "X-API-KEY",
 		},
 		ExposeHeaders: []string{
 			"Content-Length",
