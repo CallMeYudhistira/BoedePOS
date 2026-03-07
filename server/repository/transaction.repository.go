@@ -32,6 +32,11 @@ func GetAllTransaction(db *gorm.DB, filter model.DateFilter) ([]model.Transactio
 		query = query.Where("DATE(created_at) BETWEEN ? AND ?", filter.StartDate, filter.EndDate)
 	}
 
+	if filter.Page > 0 && filter.Limit > 0 {
+		offset := (filter.Page - 1) * filter.Limit
+		query = query.Limit(filter.Limit).Offset(offset)
+	}
+
 	err := query.Find(&transactions).Error
 	if err == nil {
 		for i := range transactions {

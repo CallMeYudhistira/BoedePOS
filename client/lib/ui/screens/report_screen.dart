@@ -57,62 +57,63 @@ class _ReportScreenState extends State<ReportScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
+        borderRadius: AppConstants.largeBorderRadius,
+        boxShadow: AppConstants.commonShadow,
       ),
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppConstants.primaryColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppConstants.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(icon, color: AppConstants.textDarkColor),
+                child: Icon(icon, color: AppConstants.primaryColor, size: 26),
               ),
-              const SizedBox(width: 12),
-              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor)),
+              const SizedBox(width: 16),
+              Text(
+                title, 
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppConstants.textDarkColor, letterSpacing: -0.5),
+              ),
             ],
           ),
           const SizedBox(height: 20),
-          _buildStatRow('Total Omzet', AppConstants.currencyFormat.format(report.totalTurnover), isHighlight: true),
-          const Divider(height: 30),
-          _buildStatRow('Total Transaksi', '${report.totalTransactions}'),
-          _buildStatRow('Barang Terjual', '${report.totalItemsSold}'),
-          if (report.mostSoldProductName != null)
-            _buildStatRow('Produk Terlaris', '${report.mostSoldProductName} (${report.mostSoldProductQty}x)'),
+          _buildStatRow('Total Turnover', AppConstants.currencyFormat.format(report.totalTurnover), isHighlight: true),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12.0),
+            child: Divider(height: 1),
+          ),
+          _buildStatRow('Transactions', '${report.totalTransactions}'),
+          const SizedBox(height: 8),
+          _buildStatRow('Items Sold', '${report.totalItemsSold}'),
+          if (report.mostSoldProductName != null) ...[
+            const SizedBox(height: 8),
+            _buildStatRow('Top Product', '${report.mostSoldProductName} (${report.mostSoldProductQty}x)'),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildStatRow(String label, String value, {bool isHighlight = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(fontSize: isHighlight ? 16 : 15, color: AppConstants.textLightColor)),
-          Text(
-            value, 
-            style: TextStyle(
-              fontSize: isHighlight ? 20 : 16, 
-              fontWeight: isHighlight ? FontWeight.bold : FontWeight.w600, 
-              color: isHighlight ? AppConstants.textDarkColor : AppConstants.textDarkColor.withValues(alpha: 0.8),
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(fontSize: 13, color: AppConstants.textLightColor, fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w600)),
+        Text(
+          value, 
+          style: TextStyle(
+            fontSize: isHighlight ? 18 : 14, 
+            fontWeight: FontWeight.w900, 
+            color: isHighlight ? AppConstants.primaryColor : AppConstants.textDarkColor,
+            letterSpacing: isHighlight ? -0.5 : 0,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

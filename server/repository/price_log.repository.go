@@ -25,6 +25,11 @@ func GetPriceLogs(db *gorm.DB, filter model.PriceLogFilter) ([]model.PriceLog, e
 		query = query.Where("DATE(created_at) BETWEEN ? AND ?", filter.StartDate, filter.EndDate)
 	}
 
+	if filter.Page > 0 && filter.Limit > 0 {
+		offset := (filter.Page - 1) * filter.Limit
+		query = query.Limit(filter.Limit).Offset(offset)
+	}
+
 	err := query.Find(&priceLogs).Error
 	return priceLogs, err
 }

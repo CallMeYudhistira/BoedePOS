@@ -27,13 +27,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Riwayat Transaksi',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Riwayat Transaksi',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppConstants.textDarkColor, letterSpacing: -0.5),
+                    ),
+                    Text(
+                      'Pantau catatan penjualan Anda',
+                      style: TextStyle(fontSize: 12, color: AppConstants.textLightColor, fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
                 Consumer<TransactionProvider>(
                   builder: (context, provider, child) {
@@ -48,15 +57,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             initialDate: DateTime.now(),
                             firstDate: DateTime(2020),
                             lastDate: DateTime(2100),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: const ColorScheme.light(
+                                    primary: AppConstants.primaryColor,
+                                    onPrimary: Colors.white,
+                                    onSurface: AppConstants.textDarkColor,
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
                           );
                           if (date != null) provider.setSelectedDate(date);
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         decoration: BoxDecoration(
                           color: isDateSelected ? AppConstants.primaryColor : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: AppConstants.commonShadow,
                         ),
                         child: Row(
                           children: [
@@ -64,13 +86,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
                                 child: Text(
-                                  DateFormat('dd MMM yyyy').format(provider.selectedDate!),
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  DateFormat('dd MMM').format(provider.selectedDate!),
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
                                 ),
                               ),
                             Icon(
-                              isDateSelected ? Icons.event_busy : Icons.calendar_today,
-                              color: isDateSelected ? Colors.white : AppConstants.textDarkColor,
+                              isDateSelected ? Icons.event_busy_rounded : Icons.calendar_month_rounded,
+                              color: isDateSelected ? Colors.white : AppConstants.primaryColor,
                               size: 20,
                             ),
                           ],
@@ -94,104 +116,163 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     child: ListView(
                       children: const [
                         SizedBox(height: 100),
-                        Center(child: Text('Tidak ada transaksi ditemukan.', style: TextStyle(color: Colors.grey, fontSize: 16))),
+                        Center(child: Text('Tidak ada transaksi ditemukan.', style: TextStyle(color: Colors.grey, fontSize: 14))),
                       ],
                     ),
                   );
                 }
-                return RefreshIndicator(
-                  onRefresh: () => provider.fetchTransactions(),
-                  color: AppConstants.textDarkColor,
-                  backgroundColor: AppConstants.primaryColor,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: provider.transactions.length,
-                    itemBuilder: (context, index) {
-                      final t = provider.transactions[index];
-                      final date = DateTime.tryParse(t.createdAt) ?? DateTime.now();
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            )
-                          ],
-                        ),
-                        child: Theme(
-                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            leading: Container(
-                              padding: const EdgeInsets.all(10),
+                return Column(
+                  children: [
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () => provider.fetchTransactions(),
+                        color: AppConstants.textDarkColor,
+                        backgroundColor: AppConstants.primaryColor,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          itemCount: provider.transactions.length,
+                          itemBuilder: (context, index) {
+                            final t = provider.transactions[index];
+                            final date = DateTime.tryParse(t.createdAt) ?? DateTime.now();
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
-                                color: AppConstants.primaryColor.withValues(alpha: 0.2),
-                                shape: BoxShape.circle,
+                                color: Colors.white,
+                                borderRadius: AppConstants.commonBorderRadius,
+                                boxShadow: AppConstants.commonShadow,
                               ),
-                              child: const Icon(Icons.receipt_long_rounded, color: AppConstants.textDarkColor),
-                            ),
-                            title: Text('INV-${t.id.toString().padLeft(6, '0')}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppConstants.textDarkColor)),
-                            subtitle: Text(DateFormat('dd MMM yyyy • HH:mm').format(date), style: const TextStyle(color: AppConstants.textLightColor, fontSize: 13)),
-                            trailing: Text(
-                              AppConstants.currencyFormat.format(t.total),
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppConstants.textDarkColor),
-                            ),
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Theme(
+                                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                child: ExpansionTile(
+                                  tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  leading: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: AppConstants.backgroundColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Icon(Icons.receipt_rounded, color: AppConstants.primaryColor, size: 26),
+                                  ),
+                                  title: Text(
+                                    'Order #INV-${t.id.toString().padLeft(4, '0')}', 
+                                    style: const TextStyle(fontWeight: FontWeight.w900, color: AppConstants.textDarkColor, fontSize: 14),
+                                  ),
+                                  subtitle: Text(
+                                    DateFormat('dd MMM yyyy • HH:mm').format(date), 
+                                    style: const TextStyle(color: AppConstants.textLightColor, fontSize: 12, fontWeight: FontWeight.w600),
+                                  ),
+                                  trailing: Text(
+                                    AppConstants.currencyFormat.format(t.total),
+                                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppConstants.primaryColor, letterSpacing: -0.5),
+                                  ),
                                   children: [
-                                    ...t.details.map((d) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    Container(
+                                      padding: const EdgeInsets.all(16.0),
+                                      decoration: BoxDecoration(
+                                        color: AppConstants.backgroundColor.withValues(alpha: 0.5),
+                                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Text('${d.qty}x', style: const TextStyle(fontWeight: FontWeight.bold, color: AppConstants.textLightColor)),
-                                              const SizedBox(width: 8),
-                                              Text(d.productName, style: const TextStyle(fontWeight: FontWeight.w500)),
-                                            ],
+                                          ...t.details.map((d) => Padding(
+                                            padding: const EdgeInsets.only(bottom: 10.0),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                        decoration: BoxDecoration(
+                                                          color: AppConstants.primaryColor.withValues(alpha: 0.1),
+                                                          borderRadius: BorderRadius.circular(6),
+                                                        ),
+                                                        child: Text('${d.qty}x', style: const TextStyle(fontWeight: FontWeight.w900, color: AppConstants.primaryColor, fontSize: 11)),
+                                                      ),
+                                                      const SizedBox(width: 10),
+                                                      Expanded(child: Text(d.productName, style: const TextStyle(fontWeight: FontWeight.w700, color: AppConstants.textDarkColor, fontSize: 13))),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Text(AppConstants.currencyFormat.format(d.subtotal), style: const TextStyle(fontWeight: FontWeight.w800, color: AppConstants.textDarkColor, fontSize: 13)),
+                                              ],
+                                            ),
+                                          )),
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                                            child: Divider(height: 1),
                                           ),
-                                          Text(AppConstants.currencyFormat.format(d.subtotal), style: const TextStyle(fontWeight: FontWeight.w500)),
+                                          _buildDetailRow('Jumlah Bayar', AppConstants.currencyFormat.format(t.pay)),
+                                          const SizedBox(height: 4),
+                                          _buildDetailRow('Kembalian', AppConstants.currencyFormat.format(t.change), isHighlighted: true),
                                         ],
                                       ),
-                                    )),
-                                    const Divider(height: 24),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text('Total Bayar', style: TextStyle(color: AppConstants.textLightColor)),
-                                        Text(AppConstants.currencyFormat.format(t.pay), style: const TextStyle(fontWeight: FontWeight.w600)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text('Kembalian', style: TextStyle(color: AppConstants.textLightColor)),
-                                        Text(AppConstants.currencyFormat.format(t.change), style: const TextStyle(fontWeight: FontWeight.w600)),
-                                      ],
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    _buildPaginationControls(provider),
+                  ],
                 );
               },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPaginationControls(TransactionProvider provider) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: provider.currentPage > 1 ? () => provider.setPage(provider.currentPage - 1) : null,
+            icon: const Icon(Icons.chevron_left_rounded),
+            style: IconButton.styleFrom(backgroundColor: AppConstants.backgroundColor),
+          ),
+          Text(
+            'Halaman ${provider.currentPage} dari ${provider.totalPages}',
+            style: const TextStyle(fontWeight: FontWeight.w700, color: AppConstants.textDarkColor, fontSize: 14),
+          ),
+          IconButton(
+            onPressed: provider.currentPage < provider.totalPages ? () => provider.setPage(provider.currentPage + 1) : null,
+            icon: const Icon(Icons.chevron_right_rounded),
+            style: IconButton.styleFrom(backgroundColor: AppConstants.backgroundColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, {bool isHighlighted = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w600, fontSize: 14)),
+        Text(
+          value, 
+          style: TextStyle(
+            fontWeight: FontWeight.w900, 
+            color: isHighlighted ? Colors.green : AppConstants.textDarkColor,
+            fontSize: 15,
+          ),
+        ),
+      ],
     );
   }
 }

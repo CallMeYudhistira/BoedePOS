@@ -34,25 +34,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
             color: AppConstants.textDarkColor,
             backgroundColor: AppConstants.primaryColor,
             child: ListView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(20.0),
               children: [
                 const Text(
                   "Ringkasan Hari Ini",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppConstants.textDarkColor, letterSpacing: -0.5),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 4),
+                const Text(
+                  "Ringkasan bisnis Anda hari ini",
+                  style: TextStyle(fontSize: 12, color: AppConstants.textLightColor, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 24),
                 _buildStatCard(
                   'Total Pendapatan', 
                   AppConstants.currencyFormat.format(daily?.totalTurnover ?? 0), 
                   Icons.monetization_on_rounded,
                   isPrimary: true,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Row(
                   children: [
-                    Expanded(child: _buildStatCard('Transaksi', '${daily?.totalTransactions ?? 0}', Icons.receipt_long_rounded)),
+                    Expanded(child: _buildStatCard('Pesanan', '${daily?.totalTransactions ?? 0}', Icons.receipt_long_rounded)),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildStatCard('Produk Terjual', '${daily?.totalItemsSold ?? 0}', Icons.shopping_bag_rounded)),
+                    Expanded(child: _buildStatCard('Produk Terjual', '${daily?.totalItemsSold ?? 0}', Icons.shopping_basket_rounded)),
                   ],
                 ),
               ],
@@ -67,44 +72,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       decoration: BoxDecoration(
         color: isPrimary ? AppConstants.primaryColor : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
+        borderRadius: AppConstants.largeBorderRadius,
+        boxShadow: AppConstants.commonShadow,
       ),
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title, 
-                style: TextStyle(
-                  fontSize: 16, 
-                  color: isPrimary ? Colors.white70 : AppConstants.textLightColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Icon(
-                icon, 
-                size: 28, 
-                color: isPrimary ? Colors.white : AppConstants.primaryColor,
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isPrimary ? Colors.white.withValues(alpha: 0.2) : AppConstants.backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              icon, 
+              size: 32, 
+              color: isPrimary ? Colors.white : AppConstants.primaryColor,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
-            value, 
+            title, 
             style: TextStyle(
-              fontSize: isPrimary ? 32 : 24, 
-              fontWeight: FontWeight.bold, 
-              color: isPrimary ? Colors.white : AppConstants.textDarkColor,
+              fontSize: 14, 
+              color: isPrimary ? Colors.white70 : AppConstants.textLightColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value, 
+              style: TextStyle(
+                fontSize: isPrimary ? 28 : 22, 
+                fontWeight: FontWeight.w900, 
+                color: isPrimary ? Colors.white : AppConstants.textDarkColor,
+                letterSpacing: -1,
+              ),
             ),
           ),
         ],

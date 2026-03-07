@@ -38,8 +38,8 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error: ${e.toString()}');
-      return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
+      NavigationService.showSnackbar('Kesalahan koneksi: ${e.toString()}');
+      return {'success': false, 'message': 'Kesalahan koneksi atau waktu habis', 'error': e.toString()};
     }
   }
 
@@ -57,8 +57,8 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error: ${e.toString()}');
-      return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
+      NavigationService.showSnackbar('Kesalahan koneksi: ${e.toString()}');
+      return {'success': false, 'message': 'Kesalahan koneksi atau waktu habis', 'error': e.toString()};
     }
   }
 
@@ -76,8 +76,8 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error: ${e.toString()}');
-      return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
+      NavigationService.showSnackbar('Kesalahan koneksi: ${e.toString()}');
+      return {'success': false, 'message': 'Kesalahan koneksi atau waktu habis', 'error': e.toString()};
     }
   }
 
@@ -94,8 +94,8 @@ class ApiClient {
       return _handleResponse(response);
     } catch (e) {
       debugPrint('API_ERR: $e');
-      NavigationService.showSnackbar('Connection error: ${e.toString()}');
-      return {'success': false, 'message': 'Connection error or timeout', 'error': e.toString()};
+      NavigationService.showSnackbar('Kesalahan koneksi: ${e.toString()}');
+      return {'success': false, 'message': 'Kesalahan koneksi atau waktu habis', 'error': e.toString()};
     }
   }
 
@@ -104,10 +104,10 @@ class ApiClient {
     try {
       decoded = jsonDecode(response.body);
     } catch (_) {
-      NavigationService.showSnackbar('API Error: ${response.statusCode}');
+      NavigationService.showSnackbar('Kesalahan API: ${response.statusCode}');
       return {
         'success': false,
-        'message': 'API Error: ${response.statusCode}',
+        'message': 'Kesalahan API: ${response.statusCode}',
         'error': response.body,
       };
     }
@@ -117,9 +117,9 @@ class ApiClient {
     } else {
       if (response.statusCode == 422) {
         // Validation error, don't show snackbar here as it will be shown under fields
-        NavigationService.showSnackbar(decoded['message'] ?? 'Validation error');
+        NavigationService.showSnackbar(decoded['message'] ?? 'Kesalahan validasi');
       } else {
-        String errorMessage = 'API Error: ${response.statusCode}';
+        String errorMessage = 'Kesalahan API: ${response.statusCode}';
         if (decoded['message'] is String && decoded['message'].isNotEmpty) {
           errorMessage = decoded['message'];
         } else if (decoded['error'] is String && decoded['error'].isNotEmpty) {

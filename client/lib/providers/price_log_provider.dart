@@ -10,23 +10,40 @@ class PriceLogProvider with ChangeNotifier {
   DateTime? _selectedDate;
   Map<String, String> _validationErrors = {};
 
-  List<PriceLog> get priceLogs {
-    var filtered = _priceLogs;
-    
-    if (_selectedDate != null) {
-      final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate!);
-      filtered = filtered.where((l) => l.createdAt.startsWith(dateStr)).toList();
-    }
-    
-    if (_searchQuery.isNotEmpty) {
-      final query = _searchQuery.toLowerCase();
-      filtered = filtered.where((l) => (l.product?.name.toLowerCase() ?? '').contains(query)).toList();
-    }
-    
-    return filtered;
+  int _currentPage = 1;
+  static const int _pageSize = 10;
+
+  int get currentPage => _currentPage;
+  int get totalPages {
+    if (_priceLogs.length < _pageSize) return _currentPage;
+    return _currentPage + 1;
   }
 
-  bool get isLoading => _isLoading && _priceLogs.isEmpty;
+  List<PriceLog> get priceLogs {
+    // Filter to show only the latest record per product (still needed if backend doesn't filter)
+    final Map<int, PriceLog> latestPerProduct = {};
+    for (var log in _priceLogs) {
+      if (log.product != null) {
+        final productId = log.product!.id;
+        final existing = latestPerProduct[productId];
+        if (existing == null || DateTime.parse(log.createdAt).isAfter(DateTime.parse(existing.createdAt))) {
+          latestPerProduct[productId] = log;
+        }
+      }
+    }
+    
+    final result = latestPerProduct.values.toList();
+    result.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return result;
+  }
+
+  void setPage(int page) {
+    if (page < 1 || page > totalPages) return;
+    _currentPage = page;
+    fetchPriceLogs();
+  }
+
+  bool get isLoading => _isLoading;
   Map<String, String> get validationErrors => _validationErrors;
 
   void clearValidationErrors() {
@@ -36,12 +53,14 @@ class PriceLogProvider with ChangeNotifier {
 
   void setSearchQuery(String query) {
     _searchQuery = query;
-    notifyListeners();
+    _currentPage = 1; // Reset to first page
+    fetchPriceLogs();
   }
 
   void setSelectedDate(DateTime? date) {
     _selectedDate = date;
-    notifyListeners();
+    _currentPage = 1; // Reset to first page
+    fetchPriceLogs();
   }
 
   DateTime? get selectedDate => _selectedDate;
@@ -50,8 +69,17 @@ class PriceLogProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      final endpoint = productId != null ? '/price_logs/$productId' : '/price_logs';
-      final res = await ApiClient.get(endpoint);
+      final queryParams = {
+        'page': _currentPage.toString(),
+        'limit': _pageSize.toString(),
+        if (_searchQuery.isNotEmpty) 'name': _searchQuery,
+        if (_selectedDate != null) 'date': DateFormat('yyyy-MM-dd').format(_selectedDate!),
+        if (productId != null) 'product_id': productId.toString(),
+      };
+      
+      final queryString = Uri(queryParameters: queryParams).query;
+      final res = await ApiClient.get('/price_logs?$queryString');
+      
       if (res['success'] == true) {
         _priceLogs = (res['data'] as List).map((p) => PriceLog.fromJson(p)).toList();
       }

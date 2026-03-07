@@ -33,6 +33,11 @@ func GetAllProduct(db *gorm.DB, filter model.ProductFilter) ([]model.Product, er
 	if filter.Name != "" {
 		query = query.Where("name ILIKE ?", "%"+filter.Name+"%")
 	}
+
+	if filter.Page > 0 && filter.Limit > 0 {
+		offset := (filter.Page - 1) * filter.Limit
+		query = query.Limit(filter.Limit).Offset(offset)
+	}
 	
 	err := query.Find(&products).Error
 	return products, err

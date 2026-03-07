@@ -8,12 +8,27 @@ class ProductProvider with ChangeNotifier {
   String _searchQuery = '';
   Map<String, String> _validationErrors = {};
 
+  int _currentPage = 1;
+  static const int _pageSize = 10;
+
+  int get currentPage => _currentPage;
+  int get totalPages {
+    // Basic estimation since API doesn't return total count
+    if (_products.length < _pageSize) return _currentPage;
+    return _currentPage + 1;
+  }
+
   List<Product> get products {
-    if (_searchQuery.isEmpty) return _products;
-    return _products.where((p) => p.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+    return _products;
+  }
+
+  void setPage(int page) {
+    if (page < 1 || page > totalPages) return;
+    _currentPage = page;
+    fetchProducts(); // Re-fetch on page change
   }
   
-  bool get isLoading => _isInitialLoading && _products.isEmpty;
+  bool get isLoading => _isInitialLoading; // Adjusted isLoading
   Map<String, String> get validationErrors => _validationErrors;
 
   void clearValidationErrors() {
@@ -23,14 +38,27 @@ class ProductProvider with ChangeNotifier {
 
   void setSearchQuery(String query) {
     _searchQuery = query;
-    notifyListeners();
+    _currentPage = 1; // Reset to first page on search
+    fetchProducts(); // Re-fetch on search
   }
 
   Future<void> fetchProducts() async {
+    _isInitialLoading = true;
+    notifyListeners();
     try {
-      final res = await ApiClient.get('/products');
+      final queryParams = {
+        'page': _currentPage.toString(),
+        'limit': _pageSize.toString(),
+        if (_searchQuery.isNotEmpty) 'name': _searchQuery,
+      };
+      
+      final queryString = Uri(queryParameters: queryParams).query;
+      final res = await ApiClient.get('/products?$queryString');
+      
       if (res['success'] == true) {
         _products = (res['data'] as List).map((p) => Product.fromJson(p)).toList();
+        // Note: Total pages might need a separate count from API for accurate pagination
+        // Since API doesn't return total count yet, we'll keep a simple approach
       }
     } catch (e) {
       debugPrint('Failed to fetch products: $e');

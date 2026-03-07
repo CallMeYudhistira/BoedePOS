@@ -95,7 +95,7 @@ class _ProductScreenState extends State<ProductScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppConstants.textDarkColor,
+                            backgroundColor: AppConstants.primaryColor,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -131,29 +131,26 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showProductDialog(),
-        backgroundColor: AppConstants.primaryColor,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add),
-        label: const Text("Produk Baru", style: TextStyle(fontWeight: FontWeight.bold)),
-      ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              onChanged: (val) => context.read<ProductProvider>().setSearchQuery(val),
-              decoration: InputDecoration(
-                hintText: 'Cari produk...',
-                prefixIcon: const Icon(Icons.search, color: AppConstants.textLightColor),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+            padding: const EdgeInsets.all(20.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: AppConstants.commonBorderRadius,
+                boxShadow: AppConstants.commonShadow,
+              ),
+              child: TextField(
+                onChanged: (val) => context.read<ProductProvider>().setSearchQuery(val),
+                decoration: InputDecoration(
+                  hintText: 'Cari produk berdasarkan nama atau ID...',
+
+                  hintStyle: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w500, fontSize: 14),
+                  prefixIcon: const Icon(Icons.search_rounded, color: AppConstants.primaryColor, size: 24),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
               ),
             ),
           ),
@@ -169,109 +166,173 @@ class _ProductScreenState extends State<ProductScreen> {
                     child: ListView(
                       children: const [
                         SizedBox(height: 100),
-                        Center(child: Text('Produk tidak ditemukan.', style: TextStyle(color: Colors.grey, fontSize: 16))),
+                        Center(child: Text('Produk tidak ditemukan.', style: TextStyle(color: Colors.grey, fontSize: 14))),
                       ],
                     ),
                   );
                 }
-                return RefreshIndicator(
-                  onRefresh: () => provider.fetchProducts(),
-                  color: AppConstants.textDarkColor,
-                  backgroundColor: AppConstants.primaryColor,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 80),
-                    itemCount: provider.products.length,
-                    itemBuilder: (context, index) {
-                      final p = provider.products[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            )
-                          ],
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                          leading: CircleAvatar(
-                            backgroundColor: p.isFraction ? Colors.orange.withValues(alpha: 0.1) : AppConstants.primaryColor.withValues(alpha: 0.2),
-                            child: Icon(
-                              p.isFraction ? Icons.scale : Icons.inventory_2,
-                              color: p.isFraction ? Colors.orange : AppConstants.textDarkColor,
-                            ),
-                          ),
-                          title: Row(
-                            children: [
-                              Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text('#${p.id}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                return Column(
+                  children: [
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () => provider.fetchProducts(),
+                        color: AppConstants.textDarkColor,
+                        backgroundColor: AppConstants.primaryColor,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                          itemCount: provider.products.length,
+                          itemBuilder: (context, index) {
+                            final p = provider.products[index];
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: AppConstants.commonBorderRadius,
+                                boxShadow: AppConstants.commonShadow,
                               ),
-                            ],
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppConstants.currencyFormat.format(p.price),
-                                style: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w600),
-                              ),
-                              Text(
-                                p.isFraction ? "Jenis: Barang Pecahan" : "Jenis: Standar",
-                                style: TextStyle(fontSize: 12, color: p.isFraction ? Colors.orange : Colors.blueGrey),
-                              ),
-                            ],
-                          ),                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent),
-                                onPressed: () => _showProductDialog(product: p),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                onPressed: () async {
-                                  bool confirm = await showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Hapus Produk'),
-                                      content: Text('Apakah Anda yakin ingin menghapus ${p.name}?'),
-                                      actions: [
-                                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                                          onPressed: () => Navigator.pop(context, true), 
-                                          child: const Text('Hapus'),
-                                        ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: AppConstants.backgroundColor,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Icon(
+                                        p.isFraction ? Icons.scale_rounded : Icons.inventory_2_rounded,
+                                        color: p.isFraction ? Colors.orange : AppConstants.primaryColor,
+                                        size: 26,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            p.name, 
+                                            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppConstants.textDarkColor, height: 1.2),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            AppConstants.currencyFormat.format(p.price),
+                                            style: const TextStyle(color: AppConstants.primaryColor, fontWeight: FontWeight.w900, fontSize: 13),
+                                          ),
+                                          Text(
+                                            p.isFraction ? "Berat Variabel" : "Satuan Standar",
+                                            style: TextStyle(fontSize: 11, color: p.isFraction ? Colors.orange : AppConstants.textLightColor, fontWeight: FontWeight.w600),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _buildActionBtn(Icons.edit_note_rounded, Colors.blue, () => _showProductDialog(product: p)),
+                                        const SizedBox(width: 8),
+                                        _buildActionBtn(Icons.delete_sweep_rounded, Colors.red, () async {
+                                          bool confirm = await showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                                              title: const Text('Hapus Produk', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+                                              content: Text('Apakah Anda yakin ingin menghapus ${p.name}?', style: const TextStyle(fontSize: 14)),
+                                              actions: [
+                                                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                                                  onPressed: () => Navigator.pop(context, true), 
+                                                  child: const Text('Hapus'),
+                                                ),
+                                              ],
+                                            ),
+                                          ) ?? false;
+                                          if (confirm && context.mounted) {
+                                            context.read<ProductProvider>().deleteProduct(p.id);
+                                          }
+                                        }),
                                       ],
                                     ),
-                                  ) ?? false;
-                                  if (confirm && context.mounted) {
-                                    context.read<ProductProvider>().deleteProduct(p.id);
-                                  }
-                                },
+                                  ],
+                                ),
                               ),
-                            ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _showProductDialog(),
+                          icon: const Icon(Icons.add_business_rounded, size: 20),
+                          label: const Text("Buat Produk Baru", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppConstants.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            elevation: 4,
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    _buildPaginationControls(provider),
+                  ],
                 );
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPaginationControls(ProductProvider provider) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: provider.currentPage > 1 ? () => provider.setPage(provider.currentPage - 1) : null,
+            icon: const Icon(Icons.chevron_left_rounded),
+            style: IconButton.styleFrom(backgroundColor: AppConstants.backgroundColor),
+          ),
+          Text(
+            'Halaman ${provider.currentPage} dari ${provider.totalPages}',
+            style: const TextStyle(fontWeight: FontWeight.w700, color: AppConstants.textDarkColor, fontSize: 14),
+          ),
+          IconButton(
+            onPressed: provider.currentPage < provider.totalPages ? () => provider.setPage(provider.currentPage + 1) : null,
+            icon: const Icon(Icons.chevron_right_rounded),
+            style: IconButton.styleFrom(backgroundColor: AppConstants.backgroundColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionBtn(IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: color, size: 24),
       ),
     );
   }

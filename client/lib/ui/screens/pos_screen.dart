@@ -72,27 +72,22 @@ class _PosScreenState extends State<PosScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
+                  borderRadius: AppConstants.commonBorderRadius,
+                  boxShadow: AppConstants.commonShadow,
                 ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: (value) {
                     context.read<ProductProvider>().setSearchQuery(value);
-                    setState(() {}); // Rebuild to show/hide clear icon
+                    setState(() {});
                   },
                   decoration: InputDecoration(
-                    hintText: 'Cari produk...',
-                    prefixIcon: const Icon(Icons.search, color: AppConstants.textLightColor),
+                    hintText: 'Cari menu atau produk...',
+                    hintStyle: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w500),
+                    prefixIcon: const Icon(Icons.search_rounded, color: AppConstants.primaryColor, size: 28),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: AppConstants.textLightColor),
+                            icon: const Icon(Icons.cancel_rounded, color: Colors.grey, size: 24),
                             onPressed: () {
                               _searchController.clear();
                               context.read<ProductProvider>().setSearchQuery('');
@@ -100,13 +95,8 @@ class _PosScreenState extends State<PosScreen> {
                             },
                           )
                         : null,
-                    filled: true,
-                    fillColor: Colors.transparent, // Fill is handled by Container
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),
               ),
@@ -122,95 +112,96 @@ class _PosScreenState extends State<PosScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
+                          Icon(Icons.search_off, size: 48, color: Colors.grey.shade400),
                           const SizedBox(height: 16),
                           Text(
                             _searchController.text.isEmpty 
                                 ? "Produk tidak tersedia." 
                                 : "Produk \"${_searchController.text}\" tidak ditemukan.",
-                            style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                           ),
                         ],
                       ),
                     );
                   }
-                  return RefreshIndicator(
-                    onRefresh: () => provider.fetchProducts(),
-                    color: AppConstants.textDarkColor,
-                    backgroundColor: AppConstants.primaryColor,
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(16),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Optimized for mobile portrait
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.9,
-                      ),
-                      itemCount: provider.products.length,
-                      itemBuilder: (context, index) {
-                        final product = provider.products[index];
-                        return GestureDetector(
-                          onTap: () => _onProductTap(product),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.04),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                )
-                              ],
-                            ),
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: () => provider.fetchProducts(),
+                          color: AppConstants.textDarkColor,
+                          backgroundColor: AppConstants.primaryColor,
+                          child: GridView.builder(
                             padding: const EdgeInsets.all(16),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: AppConstants.backgroundColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    product.isFraction ? Icons.scale : Icons.shopping_bag,
-                                    color: product.isFraction ? Colors.orange : AppConstants.primaryColor,
-                                    size: 32,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  product.name,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppConstants.textDarkColor),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  AppConstants.currencyFormat.format(product.price),
-                                  style: const TextStyle(
-                                    color: AppConstants.textLightColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                if (product.isFraction) 
-                                  const Text(
-                                    'Barang Pecahan',
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                              ],
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.95,
                             ),
+                            itemCount: provider.products.length,
+                            itemBuilder: (context, index) {
+                              final product = provider.products[index];
+                              return GestureDetector(
+                                onTap: () => _onProductTap(product),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: AppConstants.commonBorderRadius,
+                                    boxShadow: AppConstants.commonShadow,
+                                  ),
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: AppConstants.backgroundColor,
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Icon(
+                                          product.isFraction ? Icons.scale_rounded : Icons.fastfood_rounded,
+                                          color: product.isFraction ? Colors.orange : AppConstants.primaryColor,
+                                          size: 32,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Expanded(
+                                        child: Text(
+                                          product.name,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800, 
+                                            fontSize: 18, 
+                                            color: AppConstants.textDarkColor,
+                                            height: 2.5,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        AppConstants.currencyFormat.format(product.price),
+                                        style: const TextStyle(
+                                          color: AppConstants.primaryColor,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 14),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                      _buildPaginationControls(provider),
+                    ],
                   );
                 },
               ),
@@ -218,58 +209,35 @@ class _PosScreenState extends State<PosScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomCartBar(context),
     );
   }
 
-  Widget _buildBottomCartBar(BuildContext context) {
-    final cart = context.watch<CartProvider>();
-    if (cart.items.isEmpty) return const SizedBox.shrink();
-
+  Widget _buildPaginationControls(ProductProvider provider) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          )
-        ],
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
       ),
-      child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${cart.items.fold(0, (sum, i) => sum + i.qty)} Barang', 
-                  style: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  AppConstants.currencyFormat.format(cart.totalAmount), 
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppConstants.textDarkColor),
-                ),
-              ],
-            ),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppConstants.primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              onPressed: () => _showCartSheet(context),
-              icon: const Icon(Icons.shopping_cart),
-              label: const Text('Lihat Keranjang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            )
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: provider.currentPage > 1 ? () => provider.setPage(provider.currentPage - 1) : null,
+            icon: const Icon(Icons.chevron_left_rounded, size: 20),
+            style: IconButton.styleFrom(backgroundColor: AppConstants.backgroundColor),
+          ),
+          Text(
+            'Halaman ${provider.currentPage} dari ${provider.totalPages}',
+            style: const TextStyle(fontWeight: FontWeight.w700, color: AppConstants.textDarkColor, fontSize: 13),
+          ),
+          IconButton(
+            onPressed: provider.currentPage < provider.totalPages ? () => provider.setPage(provider.currentPage + 1) : null,
+            icon: const Icon(Icons.chevron_right_rounded, size: 20),
+            style: IconButton.styleFrom(backgroundColor: AppConstants.backgroundColor),
+          ),
+        ],
       ),
     );
   }
@@ -295,74 +263,97 @@ class _CartSheetContentState extends State<CartSheetContent> {
       child: Container(
         decoration: const BoxDecoration(
           color: AppConstants.backgroundColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: FractionallySizedBox(
-          heightFactor: 0.85,
+          heightFactor: 0.9,
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                ),
-                child: Center(
-                  child: Container(
-                    width: 50,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(10),
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Container(
-                color: Colors.white,
-                width: double.infinity,
-                padding: const EdgeInsets.only(bottom: 16),
-                child: const Text(
-                  'Keranjang Anda', 
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Tinjau Pesanan Anda', 
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppConstants.primaryColor, letterSpacing: -0.5),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
                 child: Consumer<CartProvider>(
                   builder: (context, cartProvider, child) {
                     if (cartProvider.items.isEmpty) {
-                      return const Center(child: Text('Keranjang kosong.'));
+                      return const Center(child: Text('Keranjang Anda kosong.'));
                     }
                     return ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       itemCount: cartProvider.items.length,
                       itemBuilder: (context, index) {
                         final item = cartProvider.items[index];
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
+                          margin: const EdgeInsets.only(bottom: 16),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: AppConstants.commonBorderRadius,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              )
+                            ],
                           ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                            subtitle: Text(
-                              AppConstants.currencyFormat.format(item.price),
-                              style: const TextStyle(color: AppConstants.textLightColor),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline, color: AppConstants.textDarkColor),
-                                  onPressed: () => cartProvider.updateQty(item, item.qty - 1),
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppConstants.backgroundColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(Icons.fastfood_rounded, color: AppConstants.primaryColor, size: 28),
                                 ),
-                                Text('${item.qty}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                IconButton(
-                                  icon: const Icon(Icons.add_circle_outline, color: AppConstants.textDarkColor),
-                                  onPressed: () => cartProvider.updateQty(item, item.qty + 1),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.name, 
+                                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppConstants.textDarkColor),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        AppConstants.currencyFormat.format(item.price),
+                                        style: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w600, fontSize: 13),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    _buildQtyBtn(Icons.remove_rounded, () => cartProvider.updateQty(item, item.qty - 1)),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text(
+                                        '${item.qty}', 
+                                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppConstants.textDarkColor),
+                                      ),
+                                    ),
+                                    _buildQtyBtn(Icons.add_rounded, () => cartProvider.updateQty(item, item.qty + 1), isAdd: true),
+                                  ],
                                 ),
                               ],
                             ),
@@ -375,10 +366,11 @@ class _CartSheetContentState extends State<CartSheetContent> {
               ),
               Container(
                 padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5)),
+                    BoxShadow(color: Colors.black12, blurRadius: 20, offset: Offset(0, -5)),
                   ],
                 ),
                 child: Consumer<CartProvider>(
@@ -389,73 +381,77 @@ class _CartSheetContentState extends State<CartSheetContent> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Total Harga', style: TextStyle(fontSize: 16, color: AppConstants.textLightColor)),
+                            const Text('Total Pembayaran', style: TextStyle(fontSize: 16, color: AppConstants.textLightColor, fontWeight: FontWeight.w600)),
                             Text(
                               AppConstants.currencyFormat.format(cartProvider.totalAmount), 
-                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppConstants.textDarkColor),
+                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: AppConstants.primaryColor, letterSpacing: -0.5),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: _paymentController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          onChanged: (val) {
-                            if (_paymentError != null) {
-                              setState(() => _paymentError = null);
-                            }
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Pembayaran Pelanggan (Rp)',
-                            labelStyle: const TextStyle(color: AppConstants.textLightColor),
-                            errorText: _paymentError,
-                            filled: true,
-                            fillColor: AppConstants.backgroundColor,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                        const SizedBox(height: 24),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppConstants.backgroundColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: TextField(
+                            controller: _paymentController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppConstants.textDarkColor),
+                            onChanged: (val) {
+                              if (_paymentError != null) {
+                                setState(() => _paymentError = null);
+                              }
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Pembayaran Pelanggan (Rp)',
+                              labelStyle: const TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w600),
+                              errorText: _paymentError,
+                              border: InputBorder.none,
+                              prefixIcon: const Icon(Icons.account_balance_wallet_rounded, color: AppConstants.primaryColor, size: 28),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                             ),
-                            prefixIcon: const Icon(Icons.payments, color: AppConstants.textDarkColor),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppConstants.textDarkColor,
+                              backgroundColor: AppConstants.primaryColor,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              elevation: 4,
+                              shadowColor: AppConstants.primaryColor.withValues(alpha: 0.4),
                             ),
                             onPressed: cartProvider.isCheckingOut || cartProvider.items.isEmpty
                                 ? null
                                 : () async {
                                     final payAmount = int.tryParse(_paymentController.text) ?? 0;
                                     if (payAmount == 0) {
-                                      setState(() => _paymentError = 'Harap masukkan jumlah pembayaran');
+                                      setState(() => _paymentError = 'Harap masukkan nominal pembayaran');
                                       return;
                                     }
                                     if (payAmount < cartProvider.totalAmount) {
-                                      setState(() => _paymentError = 'Pembayaran tidak cukup!');
+                                      setState(() => _paymentError = 'Pembayaran kurang!');
                                       return;
                                     }
                                     bool success = await cartProvider.checkout(payAmount);
                                     if (success) {
                                       if (context.mounted) {
                                         Navigator.pop(context);
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checkout Berhasil!')));
+                                        _showSuccessDialog(context);
                                       }
                                     } else {
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checkout Gagal!')));
+                                        _showErrorDialog(context);
                                       }
                                     }
                                   },
                             child: cartProvider.isCheckingOut 
-                              ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                              : const Text('Proses Checkout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)) 
+                              : const Text('Selesaikan Pembelian', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
                           ),
                         ),
                       ],
@@ -465,6 +461,86 @@ class _CartSheetContentState extends State<CartSheetContent> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQtyBtn(IconData icon, VoidCallback onTap, {bool isAdd = false}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: isAdd ? AppConstants.primaryColor : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: isAdd ? AppConstants.primaryColor : Colors.grey.shade300),
+        ),
+        child: Icon(icon, color: isAdd ? Colors.white : AppConstants.textDarkColor, size: 20),
+      ),
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 16),
+            const Icon(Icons.check_circle_rounded, color: Colors.green, size: 80),
+            const SizedBox(height: 24),
+            const Text('Berhasil!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 8),
+            const Text('Pembayaran telah selesai diproses.', style: TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppConstants.primaryColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Selesai', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showErrorDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 16),
+            const Icon(Icons.error_rounded, color: Colors.red, size: 80),
+            const SizedBox(height: 24),
+            const Text('Gagal!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 8),
+            const Text('Terjadi kesalahan. Silakan coba lagi.', style: TextStyle(color: AppConstants.textLightColor, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Coba Lagi', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            )
+          ],
         ),
       ),
     );

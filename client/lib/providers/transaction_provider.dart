@@ -9,41 +9,54 @@ class TransactionProvider with ChangeNotifier {
   String _searchQuery = '';
   DateTime? _selectedDate;
 
-  List<TransactionModel> get transactions {
-    var filtered = _transactions;
-    
-    if (_selectedDate != null) {
-      final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate!);
-      filtered = filtered.where((t) => t.createdAt.startsWith(dateStr)).toList();
-    }
-    
-    if (_searchQuery.isNotEmpty) {
-      final query = _searchQuery.toLowerCase();
-      filtered = filtered.where((t) {
-        return t.details.any((d) => d.productName.toLowerCase().contains(query));
-      }).toList();
-    }
-    
-    return filtered;
+  int _currentPage = 1;
+  static const int _pageSize = 10;
+
+  int get currentPage => _currentPage;
+  int get totalPages {
+    if (_transactions.length < _pageSize) return _currentPage;
+    return _currentPage + 1;
   }
 
-  bool get isLoading => _isInitialLoading && _transactions.isEmpty;
+  List<TransactionModel> get transactions {
+    return _transactions;
+  }
+
+  void setPage(int page) {
+    if (page < 1 || page > totalPages) return;
+    _currentPage = page;
+    fetchTransactions();
+  }
+
+  bool get isLoading => _isInitialLoading;
 
   void setSearchQuery(String query) {
     _searchQuery = query;
-    notifyListeners();
+    _currentPage = 1; // Reset to first page
+    fetchTransactions();
   }
   
   void setSelectedDate(DateTime? date) {
     _selectedDate = date;
-    notifyListeners();
+    _currentPage = 1; // Reset to first page
+    fetchTransactions();
   }
 
   DateTime? get selectedDate => _selectedDate;
 
   Future<void> fetchTransactions() async {
+    _isInitialLoading = true;
+    notifyListeners();
     try {
-      final res = await ApiClient.get('/transactions');
+      final queryParams = {
+        'page': _currentPage.toString(),
+        'limit': _pageSize.toString(),
+        if (_selectedDate != null) 'date': DateFormat('yyyy-MM-dd').format(_selectedDate!),
+      };
+      
+      final queryString = Uri(queryParameters: queryParams).query;
+      final res = await ApiClient.get('/transactions?$queryString');
+      
       if (res['success'] == true) {
         _transactions = (res['data'] as List)
             .map((t) => TransactionModel.fromJson(t))

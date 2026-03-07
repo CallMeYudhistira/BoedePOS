@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'providers/product_provider.dart';
@@ -40,7 +39,7 @@ class BoedePOSApp extends StatelessWidget {
         navigatorKey: NavigationService.navigatorKey,
         scaffoldMessengerKey: NavigationService.messengerKey,
         theme: ThemeData(
-          textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
+          fontFamily: 'Gilroy',
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F678A)),
           useMaterial3: true,
         ),
